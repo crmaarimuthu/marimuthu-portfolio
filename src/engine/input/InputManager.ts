@@ -5,7 +5,8 @@ export interface InputState {
   running: boolean;
   interactPressed: boolean;
   sitTogglePressed: boolean;
-  /** Camera look delta since last consumeLookDelta() call. */
+  jumpPressed: boolean;
+  /** Camera look delta since last consumeFrameState() call. */
   lookDeltaX: number;
   lookDeltaY: number;
 }
@@ -17,6 +18,7 @@ function createEmptyState(): InputState {
     running: false,
     interactPressed: false,
     sitTogglePressed: false,
+    jumpPressed: false,
     lookDeltaX: 0,
     lookDeltaY: 0,
   };
@@ -44,14 +46,23 @@ export class InputManager {
   private running = false;
   private interactPressed = false;
   private sitTogglePressed = false;
+  private jumpPressed = false;
   private lookDeltaX = 0;
   private lookDeltaY = 0;
 
   handleKeyDown(code: string): void {
+    // Ignore OS auto-repeat: without this, holding Space/E/F re-fires
+    // the one-shot flags every repeat tick until consumeFrameState()
+    // happens to run, which reads as a stutter/multi-trigger glitch on
+    // slower frame rates. keysDown is a Set so held movement keys are
+    // unaffected (re-adding an existing member is a no-op).
+    const alreadyDown = this.keysDown.has(code);
     this.keysDown.add(code);
     if (code === "ShiftLeft" || code === "ShiftRight") this.running = true;
+    if (alreadyDown) return;
     if (code === "KeyE") this.interactPressed = true;
     if (code === "KeyF") this.sitTogglePressed = true;
+    if (code === "Space") this.jumpPressed = true;
   }
 
   handleKeyUp(code: string): void {
@@ -76,6 +87,10 @@ export class InputManager {
     this.sitTogglePressed = true;
   }
 
+  triggerJump(): void {
+    this.jumpPressed = true;
+  }
+
   addLookDelta(dx: number, dy: number): void {
     this.lookDeltaX += dx;
     this.lookDeltaY += dy;
@@ -83,7 +98,8 @@ export class InputManager {
 
   /**
    * Returns the current frame's InputState and clears one-shot flags
-   * (interactPressed, sitTogglePressed, lookDelta). Call once per frame.
+   * (interactPressed, sitTogglePressed, jumpPressed, lookDelta). Call
+   * once per frame.
    */
   consumeFrameState(): InputState {
     let moveX = this.joystick.x;
@@ -102,12 +118,14 @@ export class InputManager {
       running: this.running,
       interactPressed: this.interactPressed,
       sitTogglePressed: this.sitTogglePressed,
+      jumpPressed: this.jumpPressed,
       lookDeltaX: this.lookDeltaX,
       lookDeltaY: this.lookDeltaY,
     };
 
     this.interactPressed = false;
     this.sitTogglePressed = false;
+    this.jumpPressed = false;
     this.lookDeltaX = 0;
     this.lookDeltaY = 0;
 
@@ -120,6 +138,7 @@ export class InputManager {
     this.running = false;
     this.interactPressed = false;
     this.sitTogglePressed = false;
+    this.jumpPressed = false;
     this.lookDeltaX = 0;
     this.lookDeltaY = 0;
   }

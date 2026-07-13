@@ -31,12 +31,28 @@ buttons. It is backed by pure, unit-tested math in
 - **Single-touch tracked, multi-touch safe**: the joystick only follows
   the first pointer that engages it (ignores extra simultaneous
   touches elsewhere on screen), while `InputManager` itself has no
-  single-pointer assumption — a second touch-driven control (e.g. a
-  future camera-look area) can be added without refactoring the
+  single-pointer assumption — this is exactly what let the camera-look
+  touch region (`TouchLookArea.tsx`, see "Touch look" below) get added
+  as a second simultaneous touch control without refactoring the
   joystick.
 - **Reset on release/cancel**: both `pointerup` and `pointercancel`
   (covers interruptions like an incoming call or an OS gesture) snap
   the knob back to center and emit `(0, 0)`.
+
+## Touch look
+
+`src/ui/TouchLookArea.tsx` — a drag-to-orbit region covering the right
+~60% of the screen (`left: 40%` to the edge), rendered *before* the
+joystick/button HUD elements in `Hud.tsx`'s DOM order so those controls
+(painted after, in the same stacking context) still win hit-testing
+over the region beneath them — no manual "hole punching" needed.
+Unlike the joystick, it reports per-move-event **deltas** (this
+pointer's position minus its last known position), not an absolute
+stick offset, feeding the same `InputManager.addLookDelta` desktop
+mouse-look uses (see docs/PLAYER_SYSTEM.md "Mouse look"). It tracks
+only the first pointer that touches it, same single-touch-per-control
+policy as the joystick, so a thumb on the joystick (left) and a second
+finger dragging to look (right) work simultaneously.
 
 ## HUD control layout
 
@@ -88,8 +104,6 @@ screen region — see `docs/DIALOGUE_SYSTEM.md` "Mobile UI".
 
 ## Known limitations
 
-- No touch camera-look yet — the camera is a fixed follow rig behind
-  the character. Touch-drag orbit is planned for Milestone 2.
 - No gamepad implementation yet, though `InputManager`'s shape (a
   single aggregator with named setters) is designed to accept one
   without changing `PlayerCapsule`.

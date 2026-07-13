@@ -1,45 +1,83 @@
 "use client";
 
+import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import type { InputState } from "@/engine/input/InputManager";
 import type { PlayerTransform } from "./playerMovement";
 import { isIndoorZone, resolveOfficeZone } from "@/world/office/officeLayout";
 
-const OUTDOOR_OFFSET = new THREE.Vector3(0, 2.6, -4.2);
-/**
- * Indoor offset is shorter/lower — reduces the chance of the camera
- * poking through a wall in the tighter enclosed rooms while keeping the
- * player visible. This is a practical approximation, not true camera
- * collision (see docs/OFFICE_WORLD.md "Known limitations" — a proper
- * camera-vs-wall raycast is future work; keeping this logic in
- * CameraController rather than PlayerCapsule is what makes that future
- * upgrade a local change).
- */
-const INDOOR_OFFSET = new THREE.Vector3(0, 2.1, -2.6);
+const OUTDOOR_DISTANCE = 4.9;
+const INDOOR_DISTANCE = 3.3;
 const LOOK_HEIGHT = 1.3;
 const DAMPING = 6;
 
+const DEFAULT_PITCH = THREE.MathUtils.degToRad(24);
+const MIN_PITCH = THREE.MathUtils.degToRad(-15); // looking up
+const MAX_PITCH = THREE.MathUtils.degToRad(75); // looking down
+
+/** Radians of camera rotation per pixel of raw look delta (mouse movementX/Y or touch drag). */
+const LOOK_SENSITIVITY = 0.0025;
+
 /**
- * Third-person spring-arm style follow camera, decoupled from
- * PlayerCapsule's rendering. Free-orbit mouse look and true camera
- * collision are left for later milestones per the roadmap.
+ * Full free-look third-person orbit camera: yaw/pitch are driven by
+ * `InputState.lookDeltaX/Y` (mouse pointer-lock movement on desktop,
+ * touch-drag on mobile — see MouseLookController.tsx/TouchLookArea.tsx)
+ * and are held in local refs, independent of the player's own heading.
+ * `getCameraYaw` is exposed so player movement can be camera-relative
+ * (see playerMovement.ts) — pushing "forward" always means "away from
+ * wherever the camera is currently looking," the standard third-person
+ * convention, rather than a fixed world axis.
  */
 export function CameraController({
   getTransform,
+  getInputState,
+  onYawChange,
   reducedMotion = false,
 }: {
   getTransform: () => PlayerTransform;
+  getInputState: () => InputState;
+  onYawChange?: (yaw: number) => void;
   reducedMotion?: boolean;
 }) {
   const { camera } = useThree();
+  const yawRef = useRef(0);
+  const pitchRef = useRef(DEFAULT_PITCH);
+  const initializedRef = useRef(false);
 
   useFrame((_, dt) => {
     const t = getTransform();
-    const indoor = isIndoorZone(resolveOfficeZone(t.x, t.z));
-    const offset = indoor ? INDOOR_OFFSET : OUTDOOR_OFFSET;
+    const input = getInputState();
 
-    const rotatedOffset = offset.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), t.heading);
-    const desiredPos = new THREE.Vector3(t.x + rotatedOffset.x, rotatedOffset.y, t.z + rotatedOffset.z);
+    if (!initializedRef.current) {
+      // Start the camera behind the player's initial facing, then hand
+      // control over to free look from here on.
+      yawRef.current = t.heading;
+      initializedRef.current = true;
+    }
+
+    yawRef.current -= input.lookDeltaX * LOOK_SENSITIVITY;
+    pitchRef.current = THREE.MathUtils.clamp(
+      pitchRef.current + input.lookDeltaY * LOOK_SENSITIVITY,
+      MIN_PITCH,
+      MAX_PITCH,
+    );
+    onYawChange?.(yawRef.current);
+
+    const indoor = isIndoorZone(resolveOfficeZone(t.x, t.z));
+    const distance = indoor ? INDOOR_DISTANCE : OUTDOOR_DISTANCE;
+
+    const yaw = yawRef.current;
+    const pitch = pitchRef.current;
+    const horizontal = distance * Math.cos(pitch);
+    const vertical = distance * Math.sin(pitch);
+
+    const target = new THREE.Vector3(t.x, LOOK_HEIGHT, t.z);
+    const desiredPos = new THREE.Vector3(
+      t.x - Math.sin(yaw) * horizontal,
+      LOOK_HEIGHT + vertical,
+      t.z - Math.cos(yaw) * horizontal,
+    );
 
     if (reducedMotion) {
       camera.position.copy(desiredPos);
@@ -48,8 +86,7 @@ export function CameraController({
       camera.position.lerp(desiredPos, damping);
     }
 
-    const lookAt = new THREE.Vector3(t.x, LOOK_HEIGHT, t.z);
-    camera.lookAt(lookAt);
+    camera.lookAt(target);
   });
 
   return null;

@@ -37,3 +37,30 @@ describe("computeNextPlayerTransform", () => {
     expect(distance).toBeLessThanOrEqual(WALK_SPEED + 1e-6);
   });
 });
+
+describe("computeNextPlayerTransform — camera-relative movement", () => {
+  it("moving 'forward' (moveY=1) heads away from the camera at the camera's current yaw, not a fixed world axis", () => {
+    const current = { x: 0, z: 0, heading: 0 };
+    const input = { ...emptyInputState(), moveY: 1 };
+    const cameraYaw = Math.PI / 2; // camera has been orbited 90 degrees
+    const next = computeNextPlayerTransform(current, input, 5, cameraYaw);
+    // After enough damping time, heading should converge toward cameraYaw.
+    expect(next.heading).toBeCloseTo(cameraYaw, 1);
+  });
+
+  it("defaults to world-relative behaviour when cameraYaw is omitted (backward compatible)", () => {
+    const current = { x: 0, z: 0, heading: 0 };
+    const input = { ...emptyInputState(), moveY: 1 };
+    const next = computeNextPlayerTransform(current, input, 1);
+    expect(next.heading).toBeCloseTo(0, 5);
+  });
+
+  it("turns the character to face whichever direction is being pushed, relative to the camera", () => {
+    const current = { x: 0, z: 0, heading: 0 };
+    const cameraYaw = 0;
+    // Strafing right (moveX=1) should turn the character toward +90 degrees.
+    const input = { ...emptyInputState(), moveX: 1 };
+    const next = computeNextPlayerTransform(current, input, 5, cameraYaw);
+    expect(next.heading).toBeCloseTo(Math.PI / 2, 1);
+  });
+});

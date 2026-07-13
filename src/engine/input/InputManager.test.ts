@@ -65,6 +65,44 @@ describe("InputManager", () => {
     expect(state.moveY).toBe(-1);
   });
 
+  it("jumpPressed is a one-shot flag cleared after consumption", () => {
+    const im = new InputManager();
+    im.triggerJump();
+    expect(im.consumeFrameState().jumpPressed).toBe(true);
+    expect(im.consumeFrameState().jumpPressed).toBe(false);
+  });
+
+  it("Space key triggers jumpPressed", () => {
+    const im = new InputManager();
+    im.handleKeyDown("Space");
+    expect(im.consumeFrameState().jumpPressed).toBe(true);
+  });
+
+  it("does not re-trigger interactPressed on OS key auto-repeat (held key re-fires handleKeyDown without an intervening keyup)", () => {
+    const im = new InputManager();
+    im.handleKeyDown("KeyE");
+    im.consumeFrameState(); // first frame sees it, clears the one-shot flag
+    im.handleKeyDown("KeyE"); // OS auto-repeat while still held
+    expect(im.consumeFrameState().interactPressed).toBe(false);
+  });
+
+  it("does re-trigger interactPressed after a genuine release and re-press", () => {
+    const im = new InputManager();
+    im.handleKeyDown("KeyE");
+    im.consumeFrameState();
+    im.handleKeyUp("KeyE");
+    im.handleKeyDown("KeyE");
+    expect(im.consumeFrameState().interactPressed).toBe(true);
+  });
+
+  it("auto-repeat does not affect held movement (moveY stays 1 while W is held)", () => {
+    const im = new InputManager();
+    im.handleKeyDown("KeyW");
+    im.consumeFrameState();
+    im.handleKeyDown("KeyW"); // auto-repeat
+    expect(im.consumeFrameState().moveY).toBe(1);
+  });
+
   it("reset clears all held state", () => {
     const im = new InputManager();
     im.handleKeyDown("KeyW");

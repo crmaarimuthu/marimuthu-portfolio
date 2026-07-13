@@ -23,9 +23,14 @@ transform/collision/animation-*state* math and now renders
   Centralised so locomotion, collision, and any future avatar rigging
   agree on the same scale.
 - `src/player/playerMovement.ts` — `computeNextPlayerTransform`, a pure
-  function of `(currentTransform, InputState, dt) -> nextTransform`.
-  Unaware of collision, chairs, or the office — it only integrates
-  walk/run speed and heading.
+  function of `(currentTransform, InputState, dt, cameraYaw) ->
+  nextTransform`. Unaware of collision, chairs, or the office — it only
+  integrates walk/run speed and heading. Movement is **camera-relative**:
+  the target heading is `cameraYaw + atan2(moveX, moveY)`, so "push
+  forward" always means "away from wherever the camera is currently
+  looking," and the character turns to face whichever direction is
+  being pushed relative to the camera — not a fixed world axis. Omitting
+  `cameraYaw` defaults to `0` (world-relative), preserved for tests.
 - `src/world/office/collision.ts` — `resolveWallCollisions`, applied
   *after* `computeNextPlayerTransform` each frame in
   `PlayerCapsule.tsx`, to keep locomotion math and collision math
@@ -33,14 +38,51 @@ transform/collision/animation-*state* math and now renders
 - `src/player/animationState.ts` — the animation state machine (see
   `docs/ANIMATION_SYSTEM.md`).
 - `src/player/PlayerCapsule.tsx` — the R3F component that ties the
-  above together every frame and also owns the seated-transition lerp
-  (position/heading interpolation while `TRANSITIONING`).
-- `src/player/CameraController.tsx` — third-person follow camera,
-  intentionally decoupled from `PlayerCapsule` (reads a transform
-  getter, not the component's internals).
+  above together every frame; also owns the seated-transition lerp
+  (position/heading interpolation while `TRANSITIONING`) and a simple
+  arcade jump (gravity + initial upward velocity, visual hop only — no
+  jump animation clip exists, see docs/ANIMATION_SYSTEM.md).
+- `src/player/CameraController.tsx` — full free-look third-person orbit
+  camera (yaw + pitch), decoupled from `PlayerCapsule` (reads a
+  transform getter, not the component's internals). See "Mouse look"
+  below.
+- `src/player/MouseLookController.tsx` — requests Pointer Lock on
+  canvas click (desktop) and feeds `mousemove`'s `movementX/Y` into
+  `InputManager.addLookDelta`; actively releases pointer lock when
+  disabled (workstation mode, an open dialogue).
+- `src/ui/TouchLookArea.tsx` — the mobile equivalent: a drag region
+  (right ~60% of the HUD) reporting per-frame drag deltas into the same
+  `addLookDelta` call.
 - `src/player/InteractionController.tsx` — resolves nearby
   interactables and dispatches into `useOfficeStore` (see
   `docs/INTERACTION_SYSTEM.md`); does not touch locomotion directly.
+
+## Mouse look / camera orbit
+
+`CameraController` holds `yaw`/`pitch` in local refs, updated every
+frame from `InputState.lookDeltaX/Y` (`yaw -= lookDeltaX * sensitivity`,
+matching Three.js `OrbitControls`' left-drag convention; `pitch`
+clamped to `[-15°, 75°]` so the camera can't flip over the top or dip
+below the floor). This yaw is **independent of the player's own
+heading** — it's a free-look orbit, not a fixed follow-cam — and is
+exposed via `onYawChange` to `Experience.tsx`, which feeds it to
+`PlayerCapsule` as `getCameraYaw()` for camera-relative movement (see
+above). On mount, yaw initializes to the player's current heading so
+the camera starts directly behind the character, exactly as it did
+before free-look existed.
+
+## Jump
+
+Space (desktop) or the mobile **Jump** button
+(`InputManager.triggerJump()`) sets a one-shot `jumpPressed` flag.
+`PlayerCapsule` applies a simple gravity simulation (`GRAVITY`,
+`JUMP_SPEED` constants) only while grounded
+(`jumpHeight <= 0 && jumpVelocity <= 0`) and only during `NORMAL`
+locomotion — jumping is disabled while seated, mid sit/stand
+transition, or during a dialogue. This is a visual hop (`groupRef`'s Y
+position), not a new `PlayerAnimationState` — no jump animation clip
+exists for the current avatar (see docs/ANIMATION_SYSTEM.md), so adding
+a formal `JUMP` state would have nothing to render differently.
 
 ## Locomotion states
 
