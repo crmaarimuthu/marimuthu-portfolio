@@ -37,7 +37,8 @@ src/
     player/            Avatar integration layer (future — not yet implemented)
   vehicles/            (future milestones)
   dialogue/            Structured offline dialogue system — Milestone 5 (see docs/DIALOGUE_SYSTEM.md)
-  portfolio/           Config-driven content panels (future milestones)
+  portfolio/           Typed content schema + validation (portfolioTypes.ts, portfolioContent.ts)
+                       — data layer only, see docs/PORTFOLIO_CONTENT.md; in-world display panels remain future (Milestone 6)
   simulations/
     embedded/          Firmware/build/flash/board/GPIO/runtime domain logic — Milestone 4 (see docs/EMBEDDED_SIMULATION.md)
     can/ modbus/ ems/ bms/            (future milestones)
@@ -47,7 +48,8 @@ src/
     HUD, loading screen, 2D fallback shell
   state/               Zustand stores (useAppStore, useOfficeStore, useEmbeddedStore, useNpcStore)
   config/              profile.ts, workplace.ts, quality.ts
-  content/             npcs.json, teams.json, dialogue/*.json — Milestone 5 data-driven content
+  content/             npcs.json, teams.json, dialogue/*.json (Milestone 5);
+                       portfolio/ (techStack, skills, projects, experience, certifications — see docs/PORTFOLIO_CONTENT.md)
 ```
 
 Directories for later milestones are not created until needed, per the

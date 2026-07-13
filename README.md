@@ -39,6 +39,7 @@ pipeline (Milestone 2) remains future work; see `docs/ROADMAP.md`.
 - [`docs/NPC_SCHEDULES.md`](docs/NPC_SCHEDULES.md) — simulated world clock, role-aware schedules
 - [`docs/TEAM_SYSTEM.md`](docs/TEAM_SYSTEM.md) — team model, validation, team-lead behaviour
 - [`docs/DIALOGUE_SYSTEM.md`](docs/DIALOGUE_SYSTEM.md) — structured offline dialogue, mobile UI
+- [`docs/PORTFOLIO_CONTENT.md`](docs/PORTFOLIO_CONTENT.md) — typed skills/projects/experience content data layer (Milestone 6 prep)
 - [`docs/MOBILE_CONTROLS.md`](docs/MOBILE_CONTROLS.md) — touch input / virtual joystick / context button architecture
 - [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) — quality profiles, DPR capping, visibility handling, office instancing, NPC density budgets
 - [`docs/ASSET_PIPELINE.md`](docs/ASSET_PIPELINE.md) — current (procedural-only) asset status

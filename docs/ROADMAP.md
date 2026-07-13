@@ -60,8 +60,13 @@ Status legend: DONE / IN PROGRESS / NOT STARTED
   docs/TEAM_SYSTEM.md, docs/DIALOGUE_SYSTEM.md. NPCs still use the
   same capsule-placeholder visual tier as the player (no avatar/GLB
   pipeline — deferred Milestone 2 scope).
-- **Milestone 6 — Portfolio content** (NOT STARTED): self-introduction,
-  skills, projects, EMS/BMS presentation, all config-driven.
+- **Milestone 6 — Portfolio content** (NOT STARTED, content *data layer*
+  prepared early): self-introduction, skills, projects, EMS/BMS
+  presentation, all config-driven. The typed content schema and
+  validated data files (tech stack, skills, projects, experience,
+  certifications) already exist — see `docs/PORTFOLIO_CONTENT.md` — but
+  no in-world display surface has been built yet, and most
+  project/experience content is still `TODO_USER_INPUT`.
 - **Milestone 7 — India map & city zone** (NOT STARTED): cinematic map,
   location transition, city zone streaming.
 - **Milestone 8 — Home & day/night** (NOT STARTED): home, sleep flow,

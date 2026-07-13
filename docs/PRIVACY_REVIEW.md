@@ -44,6 +44,14 @@ not safe to expose, and how configuration enforces that boundary.
   avatar system remains architecturally ready to swap in a different
   licensed model or a stylised/non-photoreal character if that's
   preferred later.
+- `src/content/portfolio/*` (content architecture) — the *pattern* of
+  organising portfolio copy as typed data files was reviewed from
+  https://github.com/prabhagaran/portfolio at the user's request; that
+  repo carries no license, so no code, design, or personal content was
+  copied from it. Populated fields are either the user's own
+  previously-supplied information (name, title, the tech/skill
+  categories from the original brief) or `TODO_USER_INPUT`
+  placeholders — see `docs/PORTFOLIO_CONTENT.md`.
 
 ## Never to be committed to this repo or exposed client-side
 
