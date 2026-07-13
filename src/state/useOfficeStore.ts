@@ -16,11 +16,15 @@ import {
   type WorkstationContext,
 } from "@/world/office/workstationState";
 import {
+  completeCelebrateAnimation,
   completeSitAnimation,
   completeStandAnimation,
+  requestCelebrateAnimation,
   requestSitAnimation,
   requestStandAnimation,
+  requestWorkActivity,
   type PlayerAnimationState,
+  type WorkActivity,
 } from "@/player/animationState";
 import type { InteractableDescriptor } from "@/engine/interaction/InteractionSystem";
 
@@ -48,6 +52,11 @@ interface OfficeState {
   completeStandTransition: () => void;
   enterWorkstation: () => void;
   exitWorkstationMode: () => void;
+
+  /** Bridges Milestone 4 embedded-task activity into the shared player animation state machine. */
+  requestWorkAnimation: (activity: WorkActivity) => void;
+  requestCelebration: () => void;
+  completeCelebration: () => void;
 }
 
 const initialDoorStates: Record<string, DoorState> = {
@@ -125,4 +134,11 @@ export const useOfficeStore = create<OfficeState>((set, get) => ({
   },
 
   exitWorkstationMode: () => set((state) => ({ workstation: exitWorkstation(state.workstation) })),
+
+  requestWorkAnimation: (activity) =>
+    set((state) => ({ playerAnimationState: requestWorkActivity(state.playerAnimationState, activity) })),
+  requestCelebration: () =>
+    set((state) => ({ playerAnimationState: requestCelebrateAnimation(state.playerAnimationState) })),
+  completeCelebration: () =>
+    set((state) => ({ playerAnimationState: completeCelebrateAnimation(state.playerAnimationState) })),
 }));

@@ -67,6 +67,16 @@ Desktop shows a text control hint (WASD / Shift / E / F) plus a dynamic
 same `useOfficeStore.interactionPrompt`/`chair` state as the mobile
 button — the HUD never talks to the 3D scene directly.
 
+## Workstation mode (Milestone 4)
+
+While `useOfficeStore.workstation.mode === "ACTIVE"`, `Hud.tsx` returns
+`null` entirely — joystick, run, and context buttons all disappear,
+since the full-screen `WorkstationIDE` overlay occupies the same screen
+region and normal locomotion is already paused (the player is
+`SEATED`). The IDE has its own touch-friendly CODE/BUILD/FLASH/BOARD
+tab bar; see `docs/WORKSTATION_IDE.md` "Mobile layout" and "Mobile
+input isolation".
+
 ## Known limitations
 
 - No touch camera-look yet — the camera is a fixed follow rig behind

@@ -23,10 +23,23 @@ Status legend: DONE / IN PROGRESS / NOT STARTED
   docs/OFFICE_WORLD.md and docs/INTERACTION_SYSTEM.md. Does **not**
   include the embedded firmware build/flash/LED simulation (Milestone 4)
   or a real avatar (deferred Milestone 2 scope).
-- **Milestone 4 — Embedded firmware minigame** (NOT STARTED): C code
-  viewer, build/flash state machine, real 3D LED state, celebration —
-  will attach to the `boardAnchor`/`USE_WORKSTATION` seam already
-  prepared in Milestone 3.
+- **Milestone 4 — Interactive embedded firmware workstation** (DONE):
+  trusted C17 demo project ("Virtual GPIO LED Blink") with a lightweight
+  in-house syntax-highlighted code viewer; deterministic build simulator
+  (staged validation/compile/link, diagnostics, deterministic
+  demo-configured failure mode); virtual firmware image with a
+  deterministic checksum; deterministic flash simulator (staged connect/
+  erase/program/verify); a pure virtual board + GPIO reducer; a timer-
+  driven firmware runtime that blinks the configured GPIO pin; a 3D LED
+  on the workstation's embedded board that reads GPIO state directly
+  every frame (no independent animation); a success evaluator requiring
+  observed HIGH *and* LOW before declaring success; a celebration flow
+  integrated with the player animation state machine
+  (TYPE/DEBUG/INSPECT_BOARD/CELEBRATE); a persisted portfolio
+  achievement; and a full Reset Demo flow. See docs/EMBEDDED_SIMULATION.md,
+  docs/VIRTUAL_BOARD.md, docs/WORKSTATION_IDE.md. Explicitly simulated —
+  no real compiler, debug probe, or hardware is involved at any point
+  (docs/EMBEDDED_SIMULATION.md "Simulation boundary").
 - **Milestone 5 — NPCs** (NOT STARTED): NPC architecture, navigation,
   schedules, dialogue.
 - **Milestone 6 — Portfolio content** (NOT STARTED): self-introduction,
