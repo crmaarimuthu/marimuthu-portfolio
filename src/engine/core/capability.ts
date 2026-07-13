@@ -25,12 +25,20 @@ export function detectCapability(): CapabilityResult {
     return emptyResult("no-window");
   }
 
+  // A canvas can only ever bind to one context type for its lifetime —
+  // once getContext("webgl") succeeds on a canvas, a later
+  // getContext("webgl2") call on that *same* canvas always returns null,
+  // even when WebGL2 is fully supported. Each probe therefore needs its
+  // own canvas, or the webgl check silently poisons the webgl2 check.
   let webgl = false;
   let webgl2 = false;
   try {
-    const canvas = document.createElement("canvas");
-    webgl = !!canvas.getContext("webgl");
-    webgl2 = !!canvas.getContext("webgl2");
+    webgl2 = !!document.createElement("canvas").getContext("webgl2");
+  } catch {
+    // context creation can throw on some locked-down browsers; treat as unsupported
+  }
+  try {
+    webgl = !!document.createElement("canvas").getContext("webgl");
   } catch {
     // context creation can throw on some locked-down browsers; treat as unsupported
   }
