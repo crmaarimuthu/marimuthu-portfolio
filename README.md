@@ -4,7 +4,7 @@ A realistic, browser-based, third-person 3D open-world portfolio built with
 Next.js + React Three Fiber. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for
 the milestone plan; this repo currently implements **Milestones 1, 3, 4,
 and 5** (project foundation — responsive 3D canvas, capability detection,
-quality profiles, third-person player capsule, desktop/mobile controls,
+quality profiles, third-person player, desktop/mobile controls,
 camera follow — a realistic IT/embedded office with a configurable player
 workstation and a general interaction system — an interactive,
 explicitly-simulated embedded firmware workflow — and a populated office:
@@ -12,9 +12,15 @@ a fictional 10-NPC roster across CEO/HR/Manager/Team Lead/engineering
 roles, each running a role-aware daily schedule through a zone-based
 navigation system, sitting at their own workstations, occasionally
 meeting or taking a break, and reachable for a fully offline structured
-conversation). Milestone 2 (a real configurable avatar/GLB pipeline) has
-not been implemented yet — the player and every NPC are still capsule
-placeholders; see `docs/ROADMAP.md`.
+conversation). The player and every NPC now render as licensed real
+human models (Renderpeople free-tier assets — see
+[`docs/ASSET_PIPELINE.md`](docs/ASSET_PIPELINE.md)) rather than the
+earlier capsule placeholder; only two distinct people are available at
+that free tier, so individuals are differentiated by a clothing tint,
+and each has only one baked animation clip (see
+[`docs/NPC_SYSTEM.md`](docs/NPC_SYSTEM.md) "Avatar variation" for exactly
+what that does and doesn't cover). A richer configurable avatar/GLB
+pipeline (Milestone 2) remains future work; see `docs/ROADMAP.md`.
 
 ## Documentation
 

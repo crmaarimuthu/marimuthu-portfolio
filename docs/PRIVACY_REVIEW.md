@@ -21,19 +21,29 @@ not safe to expose, and how configuration enforces that boundary.
 - `content/npcs.json` (Milestone 5, implemented) — every NPC identity is
   fictional (invented names, e.g. "Priya," "Arun," "Divya"), attached to
   invented roles/teams. None reference, resemble, or were derived from
-  real colleagues, real employee IDs, real faces, or confidential
-  organisational data. Real identities may only be introduced through
-  explicit user-supplied configuration — see `docs/NPC_SYSTEM.md`
-  "Fictional identity policy". NPC avatars are the same generic capsule
-  placeholder tier as the player (no photorealistic likeness of anyone).
+  real colleagues, real employee IDs, or confidential organisational
+  data. Real identities may only be introduced through explicit
+  user-supplied configuration — see `docs/NPC_SYSTEM.md` "Fictional
+  identity policy".
 - `content/dialogue/*.json` (Milestone 5) — all dialogue content is
   invented, portfolio-safe general text. Nothing claims to be an actual
   employer statement; the CEO profile's "vision" topic is explicitly a
   `TODO_USER_INPUT` placeholder rather than a fabricated company vision
   statement.
-- The avatar system (Milestone 2+) is a stylized/configurable character,
-  not a biometric likeness, unless real reference assets are explicitly
-  supplied and approved by the user.
+- **Player/NPC 3D likeness**: the player and every NPC now render as a
+  licensed, commercially-usable human model from Renderpeople's free
+  tier (see `docs/ASSET_PIPELINE.md` "Renderpeople asset attribution").
+  These *are* real photoscanned human likenesses — but of paid,
+  consenting stock-asset models licensed by Renderpeople for exactly
+  this kind of real-time/commercial use, **not** of the portfolio
+  owner, any real coworker, or anyone connected to this project. No
+  attempt was made to depict a specific real, identifiable person tied
+  to this portfolio. Only two distinct models are available at the
+  free tier — every NPC reuses one of the two, differentiated only by
+  a clothing tint (see `docs/NPC_SYSTEM.md` "Avatar variation"). The
+  avatar system remains architecturally ready to swap in a different
+  licensed model or a stylised/non-photoreal character if that's
+  preferred later.
 
 ## Never to be committed to this repo or exposed client-side
 

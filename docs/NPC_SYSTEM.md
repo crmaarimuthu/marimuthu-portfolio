@@ -93,15 +93,29 @@ or already heading out for the day won't stop to chat).
 
 ## Avatar variation
 
-No GLB/skinned-avatar pipeline exists in this repo yet (that was
-originally scoped as "Milestone 2" and remains unimplemented — see
-`docs/PLAYER_SYSTEM.md`). NPCs use the same placeholder tier as the
-player: a capsule mesh, colour-coded per role
-(`world/office/npc/NPCInstance.tsx`), with a floating name label. This
-is explicitly **not** claimed to be photorealistic. `NPCProfile
-.avatarVariant` is present in the data model as the seam a future GLB
-pipeline will consume (one of several variant keys, so a real avatar
-swap can vary NPC appearance without every NPC looking identical).
+Player and NPCs now render as real human models (Renderpeople free-tier
+FBX assets — see `docs/ASSET_PIPELINE.md` "Renderpeople asset
+attribution" for the license verification and file details), replacing
+the earlier capsule placeholder. Only **two** distinct people are
+available at the free tier with usable baked animation ("Nathan,"
+walking; "Sophia," idling) — every player/NPC instance is one of these
+two, deterministically assigned via `pickAvatarVariant(npcId)`
+(`characters/avatar/avatarConfig.ts`) and differentiated by a
+per-character clothing tint (`pickTintColor(npcId)`) rather than being
+a unique scan each. `NPCProfile.avatarVariant` (the JSON field) is not
+currently read by the rendering path — variant assignment is derived
+from `npcId` directly — but remains in the data model as a documented
+seam for a future richer avatar library.
+
+Each model ships with exactly **one** baked animation clip (no separate
+idle/walk/sit/type/talk/celebrate set) — `PersonAvatar.tsx`
+(`characters/avatar/PersonAvatar.tsx`) plays it when appropriate
+(Nathan's walk clip while `WALKING`; Sophia's idle clip always) and
+otherwise holds the last-reached frame as a static pose. Seated states
+(`SITTING`/`WORKING`/`TYPING`/`THINKING`/`MEETING`/`BREAK`) currently
+still render the character standing at the seat/desk position — there
+is no sit animation clip available at the free tier. This is a
+documented, honest limitation, not a fabricated animation.
 
 ## Behaviour orchestration
 
