@@ -3,7 +3,11 @@
 ## Stack (see ADR_001)
 
 Next.js (App Router) + TypeScript + React Three Fiber (Three.js) +
-`@react-three/drei` + `@react-three/rapier` (physics, from Milestone 2+).
+`@react-three/drei`. `@react-three/rapier` was evaluated in ADR_001 but
+has not been added yet — Milestone 3's office collision uses a bespoke
+circle-vs-AABB resolver instead (see docs/OFFICE_WORLD.md), which is
+cheaper for a single flat floor; a full physics engine remains an option
+for a future milestone (e.g. vehicles) if the need arises.
 
 ## Top-level module layout
 
@@ -12,44 +16,58 @@ src/
   app/                 Next.js routes, layout, page shell
   engine/
     core/              Renderer/canvas bootstrap, capability detection
-    rendering/         Quality profiles, LOD, lighting rigs
-    physics/           Rapier world setup (later milestones)
-    animation/         Animation state machine primitives
-    navigation/         NPC pathfinding (later milestones)
-    audio/             Web Audio adapters (later milestones)
-    input/             InputManager, MobileInputController, gamepad hook points
+    input/             InputManager, useKeyboardInput
+    interaction/       InteractionSystem (target selection) — Milestone 3
+    rendering/         Quality profiles, LOD, lighting rigs (future)
+    physics/           Rapier world setup (future — not needed yet; collision is a custom AABB resolver, see docs/OFFICE_WORLD.md)
+    navigation/         NPC pathfinding (future milestones)
+    audio/             Web Audio adapters (future milestones)
   world/
-    city/ office/ home/ traffic/ environment/   (future milestones)
+    office/            Office world — Milestone 3 (see docs/OFFICE_WORLD.md)
+      rooms/ props/    Room-specific assembly / reusable furniture & door props
+    city/ home/ traffic/ environment/   (future milestones)
   player/
-    PlayerController, CameraController, InteractionController
+    PlayerCapsule, PlayerConfig, playerMovement, animationState,
+    CameraController, InteractionController
   characters/
-    player/ npc/        Avatar integration layer (future milestones)
+    player/ npc/        Avatar integration layer (future — not yet implemented)
   vehicles/            (future milestones)
-  interactions/
   dialogue/            (future milestones)
   portfolio/           Config-driven content panels (future milestones)
   simulations/
     embedded/ can/ modbus/ ems/ bms/            (future milestones)
   ui/                  HUD, loading screen, menus, 2D fallback shell
-  state/               Zustand stores
+  state/               Zustand stores (useAppStore, useOfficeStore)
   config/              profile.ts, workplace.ts, quality.ts
   content/             profile.json and other structured content (future)
-  utils/
 ```
 
-Milestone 1 only populates: `app/`, `engine/core`, `engine/rendering`
-(quality profiles only), `engine/input`, `player/` (capsule +
-controllers), `ui/` (loading screen, fallback), `config/`, `state/`.
 Directories for later milestones are not created until needed, per the
 "avoid unnecessary overengineering" rule in section 21 of the brief.
+`engine/physics/` (Rapier) is intentionally still empty — Milestone 3's
+office collision is a bespoke circle-vs-AABB resolver
+(`world/office/collision.ts`), which is cheaper and sufficient for a
+single flat floor; a full physics engine is deferred until vehicles or
+more complex terrain need it.
 
 ## State management
 
-Zustand is used for cross-cutting client state that both the 3D scene and
-the 2D HUD need to read/write (input state, quality profile, capability
-result, player transform summary). Local, frame-by-frame physics state
-(position deltas, velocity) stays inside R3F `useFrame` refs and is not
-pushed into Zustand every frame, to avoid unnecessary React re-renders.
+Two Zustand stores:
+
+- `state/useAppStore.ts` — quality profile, device class.
+- `state/useOfficeStore.ts` (Milestone 3) — door states, chair
+  reservation/occupancy, workstation mode, current zone, and the active
+  interaction prompt. This is genuinely cross-cutting state: the HUD,
+  `Door` props, `InteractionController`, and `PlayerCapsule` all need to
+  read or react to it, and it changes rarely (on explicit player
+  action) — unlike locomotion.
+
+Local, frame-by-frame locomotion state (position, heading, IDLE/WALK/RUN)
+stays inside R3F `useFrame` refs inside `PlayerCapsule` and is *not*
+pushed into Zustand every frame, to avoid unnecessary React re-renders —
+see `docs/PLAYER_SYSTEM.md` for the full rationale and the one exception
+(seated states, which *do* go through the store because they're rare and
+genuinely shared).
 
 ## Rendering pipeline
 
@@ -90,27 +108,45 @@ widgets render.
 
 ## Player controller
 
-Milestone 1 uses a capsule collider... actually, no physics engine yet in
-Milestone 1 (Rapier is introduced at Milestone 2 per the roadmap). The
-Milestone 1 capsule uses simple kinematic movement (position integration
-with a ground-plane clamp) driven by `InputManager` state, with a
-third-person spring-arm style `CameraController` that follows the capsule
-with damped rotation/position.
+See `docs/PLAYER_SYSTEM.md` for full detail. Summary: `PlayerCapsule`
+uses simple kinematic movement (`computeNextPlayerTransform`) plus a
+custom circle-vs-AABB collision resolver against the office's wall list
+(no physics engine); it also owns the seated-interaction lerp (Milestone
+3) driven by `useOfficeStore.pendingTransition`. `CameraController`
+follows the capsule with damped position/rotation and reduces its
+offset indoors (see `docs/OFFICE_WORLD.md`).
+
+## Interaction system (Milestone 3)
+
+See `docs/INTERACTION_SYSTEM.md`. Summary: `InteractionController` runs
+once per frame, resolves the nearest valid interactable via
+`selectBestInteractable` (`engine/interaction/InteractionSystem.ts`),
+and dispatches into `useOfficeStore` (doors, chair sit/stand,
+workstation mode). The HUD reads `useOfficeStore.interactionPrompt`
+directly — no prop drilling from the 3D scene into the DOM HUD.
 
 ## Testing boundaries
 
 Per section 22, rendering itself is not unit tested. Pure logic is
 extracted into testable modules with no Three.js/R3F dependency:
 `InputManager` (state derivation from raw events), player movement math
-(`computeNextPlayerTransform(current, input, dt)`), the animation state
-machine (`nextAnimationState`/`isTransitionAllowed`), quality selection
-and persistence (`selectInitialQualityLevel`,
-`persistQualityOverride`/`readPersistedQualityOverride`), and joystick
-dead-zone/clamp math (`normalizeJoystickDelta`) — all exercised with
-Vitest (32 tests as of Milestone 1).
+(`computeNextPlayerTransform`), the animation state machine
+(`nextAnimationState`/`isTransitionAllowed`/sit-stand transitions),
+quality selection and persistence, joystick dead-zone/clamp math,
+office zone classification (`resolveOfficeZone`), the door state
+machine (`reduceDoorState`), chair reservation/occupancy
+(`requestSit`/`requestStand`/...), workstation mode
+(`requestUseWorkstation`/`exitWorkstation`), interaction target
+selection (`selectBestInteractable`), and wall collision
+(`resolveWallCollisions`/`isPointBlocked`) — 91 tests as of Milestone 3.
 
 ## Related documentation
 
+- `docs/PLAYER_SYSTEM.md` — locomotion states, collision, config
+- `docs/ANIMATION_SYSTEM.md` — animation state machine detail
+- `docs/OFFICE_WORLD.md` — office layout, doors, collision, camera
+- `docs/INTERACTION_SYSTEM.md` — target selection, chair/workstation flow
 - `docs/MOBILE_CONTROLS.md` — touch input architecture in detail
 - `docs/PERFORMANCE.md` — quality profile fields, DPR capping,
-  visibility-based frameloop, reduced-motion handling
+  visibility-based frameloop, reduced-motion handling, office instancing
+- `docs/ASSET_PIPELINE.md` — current (procedural-only) asset status

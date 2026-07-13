@@ -73,7 +73,11 @@ export function Scene() {
           frameloop={documentVisible ? "always" : "never"}
           resize={{ scroll: false }}
         >
-          <Experience inputManager={inputManager} reducedMotion={capability.prefersReducedMotion} />
+          <Experience
+            inputManager={inputManager}
+            reducedMotion={capability.prefersReducedMotion}
+            quality={profile}
+          />
         </Canvas>
       </Suspense>
       <Hud inputManager={inputManager} deviceClass={deviceClass} />

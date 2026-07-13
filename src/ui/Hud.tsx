@@ -3,7 +3,17 @@
 import type { CSSProperties } from "react";
 import type { InputManager } from "@/engine/input/InputManager";
 import type { DeviceClass } from "@/state/useAppStore";
+import { useOfficeStore } from "@/state/useOfficeStore";
 import { VirtualJoystick } from "./VirtualJoystick";
+
+const INTENT_MOBILE_LABEL: Record<string, string> = {
+  OPEN_DOOR: "OPEN",
+  CLOSE_DOOR: "CLOSE",
+  SIT_AT_CHAIR: "SIT",
+  USE_WORKSTATION: "USE",
+  EXIT_WORKSTATION: "EXIT",
+  STAND_FROM_CHAIR: "STAND",
+};
 
 export function Hud({
   inputManager,
@@ -13,6 +23,8 @@ export function Hud({
   deviceClass: DeviceClass;
 }) {
   const isTouchDevice = deviceClass === "MOBILE" || deviceClass === "TABLET";
+  const interactionPrompt = useOfficeStore((s) => s.interactionPrompt);
+  const seated = useOfficeStore((s) => s.chair.playerState === "SEATED");
 
   return (
     <div
@@ -39,6 +51,13 @@ export function Hud({
         </div>
       )}
 
+      {!isTouchDevice && interactionPrompt && (
+        <div style={desktopPromptStyle}>E &mdash; {interactionPrompt.label}</div>
+      )}
+      {!isTouchDevice && seated && (
+        <div style={{ ...desktopPromptStyle, bottom: 84 }}>F &mdash; Stand</div>
+      )}
+
       {isTouchDevice && (
         <div
           style={{
@@ -59,23 +78,31 @@ export function Hud({
             bottom: 24,
             right: 24,
             display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
             gap: 12,
             pointerEvents: "auto",
           }}
         >
-          <button
-            onPointerDown={() => inputManager.setMobileRunning(true)}
-            onPointerUp={() => inputManager.setMobileRunning(false)}
-            style={buttonStyle}
-          >
-            Run
-          </button>
-          <button onPointerDown={() => inputManager.triggerInteract()} style={buttonStyle}>
-            Interact
-          </button>
-          <button onPointerDown={() => inputManager.triggerSitToggle()} style={buttonStyle}>
-            Sit
-          </button>
+          <div style={{ display: "flex", gap: 12 }}>
+            <button
+              onPointerDown={() => inputManager.setMobileRunning(true)}
+              onPointerUp={() => inputManager.setMobileRunning(false)}
+              style={buttonStyle}
+            >
+              Run
+            </button>
+            {interactionPrompt && (
+              <button onPointerDown={() => inputManager.triggerInteract()} style={contextButtonStyle}>
+                {INTENT_MOBILE_LABEL[interactionPrompt.intent] ?? "USE"}
+              </button>
+            )}
+          </div>
+          {seated && (
+            <button onPointerDown={() => inputManager.triggerSitToggle()} style={contextButtonStyle}>
+              STAND
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -91,4 +118,25 @@ const buttonStyle: CSSProperties = {
   color: "#e7ebef",
   fontSize: 12,
   touchAction: "none",
+};
+
+const contextButtonStyle: CSSProperties = {
+  ...buttonStyle,
+  background: "rgba(127,176,255,0.35)",
+  border: "1px solid rgba(127,176,255,0.8)",
+  fontWeight: 600,
+};
+
+const desktopPromptStyle: CSSProperties = {
+  position: "absolute",
+  bottom: 48,
+  left: "50%",
+  transform: "translateX(-50%)",
+  background: "rgba(11,13,16,0.72)",
+  border: "1px solid rgba(255,255,255,0.2)",
+  borderRadius: 6,
+  padding: "6px 14px",
+  fontSize: 13,
+  fontWeight: 600,
+  letterSpacing: 0.3,
 };

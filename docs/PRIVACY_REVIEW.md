@@ -9,11 +9,15 @@ not safe to expose, and how configuration enforces that boundary.
   **city-level, publicly known** coordinate (Coimbatore, Tamil Nadu city
   centroid), never an exact address or device GPS reading. No street
   address field exists in the schema.
-- `config/workplace.ts` — company identity fields default to a fictional
-  placeholder (`companyDisplayName: "TODO: confirm public company name"`)
-  until explicitly supplied and approved by the user. No real office floor
-  plan, internal network diagram, or proprietary source code is to be
-  reproduced.
+- `config/workplace.ts` — company identity fields default to a
+  `TODO_USER_INPUT` placeholder until explicitly supplied and approved
+  by the user. No real office floor plan, internal network diagram, or
+  proprietary source code is to be reproduced.
+- `world/office/officeLayout.ts` (Milestone 3) — the entire office room
+  layout (lobby, engineering, embedded lab, meeting, executive, HR,
+  manager, team-lead, pantry) is an invented, generic professional
+  IT/embedded office. It was not derived from, and does not reproduce,
+  any real employer's floor plan — see `docs/OFFICE_WORLD.md`.
 - NPCs (Milestone 5+) use fictional placeholder identities by default —
   no real coworker names, faces, or likenesses without explicit, separate
   approval.
@@ -35,9 +39,9 @@ not safe to expose, and how configuration enforces that boundary.
 ## Process
 
 - Any field in `config/` or `content/` that would require private
-  information is populated with a `TODO:` placeholder string rather than
-  an invented value, per the brief's explicit instruction not to fabricate
-  facts.
+  information is populated with a `TODO_USER_INPUT` placeholder string
+  rather than an invented value, per the brief's explicit instruction
+  not to fabricate facts.
 - Before any milestone adds NPC identities, employer names, or exact
   facility layouts, confirm with the user whether real reference material
   is being supplied and approved, or whether fictionalized placeholders
