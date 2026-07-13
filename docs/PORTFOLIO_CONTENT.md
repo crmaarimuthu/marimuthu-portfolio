@@ -20,13 +20,27 @@ See `docs/PRIVACY_REVIEW.md`.
 
 ## Status
 
-This is the **content layer only** — typed data files and validation,
-no new in-world UI surface. Displaying this content inside the 3D
-world (e.g. a skills board in the embedded lab, a projects panel) is
-Milestone 6 ("Portfolio content integration, full character
-self-introduction...") per `docs/ROADMAP.md`, which remains **not
-started**. This work exists so that milestone can consume ready-made,
-validated data rather than starting from nothing.
+Two consumers exist:
+
+1. **The 2D portfolio landing page** (`src/ui/portfolio/PortfolioPage.tsx`,
+   served at `/`) — a traditional dark-theme portfolio whose section
+   order (hero → about → 3D-city gateway → tech stack → skills →
+   projects → experience → certifications → contact) mirrors the
+   reference repo's structure, at the user's request. The 3D world
+   moved to the **`/city`** route (matching the reference repo's own
+   `/city` naming), reachable from the hero button, navbar, and a
+   dedicated gateway card. Placeholder (`TODO_USER_INPUT`) projects/
+   experience render as honest "coming soon" notes, never as raw
+   sentinel text or fabricated detail.
+2. In-world 3D display surfaces (a skills board in the embedded lab,
+   etc.) remain Milestone 6 scope per `docs/ROADMAP.md` — **not
+   started**.
+
+`src/config/site.ts` holds the page's public links/copy: the GitHub
+profile URL (public repo owner), contact email (user's own), and a
+tagline/about paragraph written strictly from the tech categories the
+user supplied in the original brief — no invented employers, years, or
+achievements.
 
 ## Schema
 

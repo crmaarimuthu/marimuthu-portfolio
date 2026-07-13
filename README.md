@@ -59,7 +59,11 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Desktop controls:
+Open [http://localhost:3000](http://localhost:3000) for the 2D
+portfolio landing page (hero, tech stack, skills, projects, experience,
+contact); the interactive 3D world lives at
+[http://localhost:3000/city](http://localhost:3000/city), linked from
+the page's "Enter the 3D City" button. Desktop controls (in the city):
 WASD to move, Shift to run, mouse for camera (future milestone), E to
 interact, F to sit/stand. Inside the workstation IDE: Ctrl/Cmd+B build,
 F flash, R run board, Escape exit (see `docs/WORKSTATION_IDE.md`).
