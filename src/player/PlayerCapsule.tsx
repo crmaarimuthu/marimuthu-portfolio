@@ -6,10 +6,13 @@ import * as THREE from "three";
 import type { InputState } from "@/engine/input/InputManager";
 import { computeNextPlayerTransform, type PlayerTransform } from "./playerMovement";
 import { nextAnimationState, type PlayerAnimationState } from "./animationState";
-import { PLAYER_CAPSULE_HEIGHT, PLAYER_RADIUS, SEAT_TRANSITION_DURATION_SEC } from "./PlayerConfig";
+import { PLAYER_RADIUS, SEAT_TRANSITION_DURATION_SEC } from "./PlayerConfig";
 import { resolveWallCollisions, type CollisionWall } from "@/world/office/collision";
 import { useOfficeStore } from "@/state/useOfficeStore";
 import { useNpcStore } from "@/state/useNpcStore";
+import { PersonAvatar } from "@/characters/avatar/PersonAvatar";
+
+const MOVING_ANIM_STATES = new Set<PlayerAnimationState>(["WALK", "RUN"]);
 
 export function PlayerCapsule({
   getInputState,
@@ -28,6 +31,7 @@ export function PlayerCapsule({
   const seatAnchorRef = useRef<PlayerTransform>({ x: 0, z: 0, heading: 0 });
   const transitionStartRef = useRef<PlayerTransform>({ x: 0, z: 0, heading: 0 });
   const transitionElapsedRef = useRef(0);
+  const isMovingRef = useRef(false);
 
   const locomotionState = useOfficeStore((s) => s.chair.playerState);
   const dialogueActive = useNpcStore((s) => s.dialogue !== null);
@@ -95,41 +99,25 @@ export function PlayerCapsule({
       }
     }
 
-    // Every state reachable while the player remains physically seated
-    // (Milestone 3 sit/stand plus Milestone 4 workstation-activity
-    // states, all of which only exist as children of SITTING in
-    // animationState.ts) uses the same lowered/scaled seated visual.
-    const seatedVisual =
-      animStateRef.current === "SITTING" ||
-      animStateRef.current === "SIT_DOWN" ||
-      animStateRef.current === "STAND_UP" ||
-      animStateRef.current === "TYPE" ||
-      animStateRef.current === "DEBUG" ||
-      animStateRef.current === "INSPECT_BOARD" ||
-      animStateRef.current === "CELEBRATE";
+    isMovingRef.current = MOVING_ANIM_STATES.has(animStateRef.current);
 
     if (groupRef.current) {
-      groupRef.current.position.set(
-        transformRef.current.x,
-        seatedVisual ? PLAYER_CAPSULE_HEIGHT / 2 - 0.35 : PLAYER_CAPSULE_HEIGHT / 2,
-        transformRef.current.z,
-      );
+      // The real-person model's root sits at the feet (ground level),
+      // unlike the old capsule placeholder which was centered on the
+      // body — so the group stays at y=0 rather than at a half-height
+      // offset. There is no sit animation clip available (see
+      // characters/avatar/PersonAvatar.tsx), so seated states currently
+      // still render the character standing at the seat position —
+      // a documented known limitation, not a fabricated pose.
+      groupRef.current.position.set(transformRef.current.x, 0, transformRef.current.z);
       groupRef.current.rotation.y = transformRef.current.heading;
-      groupRef.current.scale.y = seatedVisual ? 0.72 : 1;
     }
     onTransformChange?.(transformRef.current);
   });
 
   return (
     <group ref={groupRef}>
-      <mesh castShadow>
-        <capsuleGeometry args={[PLAYER_RADIUS, PLAYER_CAPSULE_HEIGHT - 0.7, 4, 8]} />
-        <meshStandardMaterial color="#4f7cff" />
-      </mesh>
-      <mesh position={[0, PLAYER_CAPSULE_HEIGHT / 2 - 0.15, 0.32]}>
-        <boxGeometry args={[0.06, 0.06, 0.08]} />
-        <meshStandardMaterial color="#0b0d10" />
-      </mesh>
+      <PersonAvatar variant="nathan" getIsMoving={() => isMovingRef.current} />
     </group>
   );
 }

@@ -144,13 +144,36 @@ detail. Highlights:
 - **Cached NPC profile lookups**: `NPC_PROFILES` is loaded and validated
   once at module import time (`npcContent.ts`), not re-parsed from JSON
   per frame or per lookup.
-- **No per-NPC dynamic lights**: NPCs are flat-shaded capsules with a
-  role-tinted material and an optional emissive tint while `TALKING` —
-  no light source is attached to any NPC.
+- **No per-NPC dynamic lights**: no light source is attached to any
+  NPC or the player.
 - **One `tick()` call for the whole population**, not one `useFrame`
   subscription per NPC — `OfficeNpcPopulation.tsx` ticks
   `useNpcStore` once per frame; the store internally loops over
   `activeNpcIds`.
+
+## Real-person avatar cost
+
+Since the Renderpeople model swap (see docs/ASSET_PIPELINE.md):
+
+- **Shared downloads via `useFBX` caching**: only two distinct FBX
+  files exist (`nathan` ~24MB, `sophia` ~10MB); `@react-three/drei`'s
+  `useFBX` caches by URL, so the player plus up to 10 NPCs sharing one
+  of the two variants each trigger only one network download per
+  variant, not one per character instance.
+- **Per-instance skeleton cloning, not re-parsing**: `PersonAvatar.tsx`
+  clones the already-downloaded/parsed FBX scene graph
+  (`SkeletonUtils.clone`) for each instance — the FBX file itself is
+  only fetched and parsed once per variant.
+- **Downscaled textures**: diffuse textures were reduced from ~8K/tens
+  of MB originals to 1024×1024 JPEGs (~150KB each) before being added
+  to the repo — see docs/ASSET_PIPELINE.md "Texture downscaling".
+- **Known cost not yet addressed**: the FBX *geometry* itself was not
+  decimated, and no Draco/Meshopt-compressed GLB conversion exists (no
+  conversion tool is available in this environment without an explicit
+  permission decision — see docs/ASSET_PIPELINE.md). Each model is
+  ~10–25MB as shipped; this is heavier than an optimized GLB would be,
+  and is called out here as a real, unresolved performance cost rather
+  than downplayed.
 
 ## Deferred, architected-for-but-not-yet-built
 

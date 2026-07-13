@@ -2,13 +2,18 @@
 
 ## Status
 
-No dedicated avatar/GLB pipeline exists yet — the player is still the
-Milestone 1 capsule placeholder (`src/player/PlayerCapsule.tsx`). A
-`docs/AVATAR_PIPELINE.md`/skinned-mesh integration is future work (was
-originally scoped as "Milestone 2" but has not been implemented in this
-repo); this document describes the player *systems* (locomotion,
-config, collision, seated interaction) that exist today and that a
-future avatar swap will plug into without disturbing them.
+The player now renders as a real human model (a licensed Renderpeople
+FBX asset — see `docs/ASSET_PIPELINE.md` and `docs/NPC_SYSTEM.md`
+"Avatar variation") in place of the earlier capsule placeholder. A
+richer avatar/GLB pipeline (configurable body/hair/clothing, a full
+matched animation clip set) remains future work (was originally scoped
+as "Milestone 2" and has not been fully implemented — only one
+walk-cycle clip is available for the player's chosen model). This
+document describes the player *systems* (locomotion, config, collision,
+seated interaction) that exist today, which the avatar swap plugged
+into without needing to change — `PlayerCapsule.tsx` still owns
+transform/collision/animation-*state* math and now renders
+`<PersonAvatar>` instead of raw capsule geometry.
 
 ## Modules
 

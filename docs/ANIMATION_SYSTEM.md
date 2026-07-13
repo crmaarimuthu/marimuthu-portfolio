@@ -48,20 +48,24 @@ from `TYPE` (must pass through `SITTING` or `DEBUG` first), and
 work-activity state can't accidentally kick the state machine back to
 locomotion).
 
-## Current visual representation (placeholder)
+## Current visual representation
 
-`PlayerCapsule.tsx` treats every state reachable while the player is
-physically seated — `SIT_DOWN`/`SITTING`/`STAND_UP` (Milestone 3) and
-`TYPE`/`DEBUG`/`INSPECT_BOARD`/`CELEBRATE` (Milestone 4, all of which
-are only reachable as children of `SITTING`) — as one "seated visual"
-group: the capsule's Y-scale drops to 0.72 and its vertical position
-lowers, giving a rough crouch/seated silhouette for the entire
-workstation session. This is explicitly a temporary stand-in — there is
-no interpolated sit or work-activity animation clip. When a real
-avatar/animation pipeline is introduced, this is the exact seam to
-replace: swap the scale hack for `AnimationMixer` clip playback keyed
-off the same `PlayerAnimationState` values, with `SIT_DOWN`/`STAND_UP`
-durations matching `SEAT_TRANSITION_DURATION_SEC` in `PlayerConfig.ts`.
+Since the real-person avatar swap (see docs/ASSET_PIPELINE.md,
+docs/NPC_SYSTEM.md "Avatar variation"), `PlayerCapsule.tsx` no longer
+applies a scale-squash hack for seated states — the earlier capsule
+placeholder used a Y-scale/position hack to fake a crouched silhouette,
+but doing that to a realistic human mesh would look visibly broken. The
+real avatar has no sit/type/think/talk/celebrate animation clip
+available at all (the licensed free-tier model ships exactly one baked
+clip — see docs/ASSET_PIPELINE.md "Renderpeople asset attribution"), so
+every state reachable while physically seated
+(`SIT_DOWN`/`SITTING`/`STAND_UP`/`TYPE`/`DEBUG`/`INSPECT_BOARD`/
+`CELEBRATE`) currently renders the character standing at the seat/desk
+position. This is an explicitly documented limitation, not a fabricated
+animation — the `PlayerAnimationState` machine itself is unaffected and
+remains the seam a future richer animation set would key off of
+(`AnimationMixer` clip playback per state, with `SIT_DOWN`/`STAND_UP`
+durations matching `SEAT_TRANSITION_DURATION_SEC` in `PlayerConfig.ts`).
 
 ## Ownership split
 
