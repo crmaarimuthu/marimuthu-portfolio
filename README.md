@@ -2,17 +2,19 @@
 
 A realistic, browser-based, third-person 3D open-world portfolio built with
 Next.js + React Three Fiber. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for
-the milestone plan; this repo currently implements **Milestones 1, 3, and 4**
-(project foundation — responsive 3D canvas, capability detection, quality
-profiles, third-person player capsule, desktop/mobile controls, camera
-follow — a realistic IT/embedded office with a configurable player
-workstation and a general interaction system — and an interactive,
-explicitly-simulated embedded firmware workflow: browse trusted C17
-source, run a deterministic build/flash simulation, start a virtual
-embedded board, and watch a real 3D LED follow live virtual-GPIO state).
-Milestone 2 (a real configurable avatar/GLB pipeline) has not been
-implemented yet — the player is still a capsule placeholder; see
-`docs/ROADMAP.md`.
+the milestone plan; this repo currently implements **Milestones 1, 3, 4,
+and 5** (project foundation — responsive 3D canvas, capability detection,
+quality profiles, third-person player capsule, desktop/mobile controls,
+camera follow — a realistic IT/embedded office with a configurable player
+workstation and a general interaction system — an interactive,
+explicitly-simulated embedded firmware workflow — and a populated office:
+a fictional 10-NPC roster across CEO/HR/Manager/Team Lead/engineering
+roles, each running a role-aware daily schedule through a zone-based
+navigation system, sitting at their own workstations, occasionally
+meeting or taking a break, and reachable for a fully offline structured
+conversation). Milestone 2 (a real configurable avatar/GLB pipeline) has
+not been implemented yet — the player and every NPC are still capsule
+placeholders; see `docs/ROADMAP.md`.
 
 ## Documentation
 
@@ -26,8 +28,13 @@ implemented yet — the player is still a capsule placeholder; see
 - [`docs/EMBEDDED_SIMULATION.md`](docs/EMBEDDED_SIMULATION.md) — firmware project, build/flash simulators, runtime, success/achievement (**read this for the simulation boundary — nothing here is real hardware/compilation**)
 - [`docs/VIRTUAL_BOARD.md`](docs/VIRTUAL_BOARD.md) — virtual board/GPIO model and the 3D LED binding
 - [`docs/WORKSTATION_IDE.md`](docs/WORKSTATION_IDE.md) — IDE layout, keyboard shortcuts, mobile tabs
+- [`docs/NPC_SYSTEM.md`](docs/NPC_SYSTEM.md) — NPC architecture, state machine, fictional identity policy
+- [`docs/NAVIGATION_SYSTEM.md`](docs/NAVIGATION_SYSTEM.md) — zone-graph pathfinding, navigation agent
+- [`docs/NPC_SCHEDULES.md`](docs/NPC_SCHEDULES.md) — simulated world clock, role-aware schedules
+- [`docs/TEAM_SYSTEM.md`](docs/TEAM_SYSTEM.md) — team model, validation, team-lead behaviour
+- [`docs/DIALOGUE_SYSTEM.md`](docs/DIALOGUE_SYSTEM.md) — structured offline dialogue, mobile UI
 - [`docs/MOBILE_CONTROLS.md`](docs/MOBILE_CONTROLS.md) — touch input / virtual joystick / context button architecture
-- [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) — quality profiles, DPR capping, visibility handling, office instancing
+- [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) — quality profiles, DPR capping, visibility handling, office instancing, NPC density budgets
 - [`docs/ASSET_PIPELINE.md`](docs/ASSET_PIPELINE.md) — current (procedural-only) asset status
 - [`docs/PRIVACY_REVIEW.md`](docs/PRIVACY_REVIEW.md) — what is and isn't safe to expose publicly
 
@@ -78,11 +85,11 @@ npm run typecheck     # TypeScript --noEmit
 npm run test          # Vitest unit tests (input, movement, animation state, quality logic)
 ```
 
-## Verification status (Milestone 4)
+## Verification status (Milestone 5)
 
 - `npm run lint` — passing
 - `npm run typecheck` — passing
-- `npm run test` — 166/166 tests passing across 24 suites
+- `npm run test` — 249/249 tests passing across 33 suites
 - `npm run build` — passing (static export of `/`)
 
 ## Configuration
@@ -106,6 +113,16 @@ LED blink from live virtual-GPIO state → task-complete celebration).
 this flow** — see [`docs/EMBEDDED_SIMULATION.md`](docs/EMBEDDED_SIMULATION.md)
 for the exact simulation boundary before assuming otherwise from the
 UI's professional styling.
+
+## Office NPCs
+
+The office is populated with a fictional 10-person roster (see
+[`docs/NPC_SYSTEM.md`](docs/NPC_SYSTEM.md) — **every identity is
+invented**, never a real coworker). Walk up to any NPC going about
+their day and press **E — Talk to <name>** (or the mobile **TALK**
+button) to open a short, fully offline conversation — no external AI
+service is called. See
+[`docs/DIALOGUE_SYSTEM.md`](docs/DIALOGUE_SYSTEM.md).
 
 ## Git workflow
 

@@ -1,0 +1,40 @@
+{
+  "id": "ceo",
+  "rootNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "npcLine": "Good to see you exploring the office. What would you like to know?",
+      "choices": [
+        { "id": "vision", "playerText": "What's the engineering vision here?", "nextNodeId": "vision" },
+        { "id": "culture", "playerText": "What's the engineering culture like?", "nextNodeId": "culture" },
+        { "id": "portfolio-owner", "playerText": "Who built this place?", "nextNodeId": "portfolio-owner" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "vision": {
+      "id": "vision",
+      "npcLine": "TODO_USER_INPUT — a placeholder company vision statement belongs here once approved.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "culture": {
+      "id": "culture",
+      "npcLine": "We try to keep engineering ownership close to the people doing the work — embedded, software, and validation all sit near each other on purpose.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "portfolio-owner": {
+      "id": "portfolio-owner",
+      "npcLine": "You should go speak with {{profileName}} directly — he can walk you through his embedded systems work himself.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    }
+  }
+}

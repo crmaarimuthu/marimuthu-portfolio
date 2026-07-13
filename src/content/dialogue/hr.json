@@ -1,0 +1,40 @@
+{
+  "id": "hr",
+  "rootNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "npcLine": "Hi! Need help finding your way around, or curious about the team structure?",
+      "choices": [
+        { "id": "structure", "playerText": "How are the teams organised?", "nextNodeId": "structure" },
+        { "id": "navigate", "playerText": "Any tips for exploring the office?", "nextNodeId": "navigate" },
+        { "id": "portfolio-owner", "playerText": "Where can I learn about the person behind this?", "nextNodeId": "portfolio-owner" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "structure": {
+      "id": "structure",
+      "npcLine": "We're organised around Leadership, People Operations, Embedded Systems, Software, and Validation — each with its own zone in the office.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "navigate": {
+      "id": "navigate",
+      "npcLine": "The embedded systems lab is worth a look — that's where most of the interesting engineering demos live.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "portfolio-owner": {
+      "id": "portfolio-owner",
+      "npcLine": "{{profileName}} — {{profileTitle}} — usually works from his desk in the engineering area. Go say hello.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    }
+  }
+}

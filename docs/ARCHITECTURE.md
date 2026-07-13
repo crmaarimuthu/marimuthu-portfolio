@@ -20,29 +20,34 @@ src/
     interaction/       InteractionSystem (target selection) — Milestone 3
     rendering/         Quality profiles, LOD, lighting rigs (future)
     physics/           Rapier world setup (future — not needed yet; collision is a custom AABB resolver, see docs/OFFICE_WORLD.md)
-    navigation/         NPC pathfinding (future milestones)
     audio/             Web Audio adapters (future milestones)
+  navigation/          Zone-graph pathfinding + navigation agent — Milestone 5 (see docs/NAVIGATION_SYSTEM.md)
   world/
     office/            Office world — Milestone 3 (see docs/OFFICE_WORLD.md)
       rooms/ props/    Room-specific assembly / reusable furniture & door props
+      npc/             NPC 3D rendering + population ticking — Milestone 5
     city/ home/ traffic/ environment/   (future milestones)
   player/
     PlayerCapsule, PlayerConfig, playerMovement, animationState,
     CameraController, InteractionController
   characters/
-    player/ npc/        Avatar integration layer (future — not yet implemented)
+    npc/               NPC identity, state machine, schedule, workstation
+                        assignment, meetings — Milestone 5 (see docs/NPC_SYSTEM.md)
+    teams/             Team model + validation — Milestone 5 (see docs/TEAM_SYSTEM.md)
+    player/            Avatar integration layer (future — not yet implemented)
   vehicles/            (future milestones)
-  dialogue/            (future milestones)
+  dialogue/            Structured offline dialogue system — Milestone 5 (see docs/DIALOGUE_SYSTEM.md)
   portfolio/           Config-driven content panels (future milestones)
   simulations/
     embedded/          Firmware/build/flash/board/GPIO/runtime domain logic — Milestone 4 (see docs/EMBEDDED_SIMULATION.md)
     can/ modbus/ ems/ bms/            (future milestones)
   ui/
     workstation/       Embedded IDE overlay (CodeViewer, Build/Flash/Board panels) — Milestone 4
+    dialogue/          Dialogue overlay (desktop + mobile) — Milestone 5
     HUD, loading screen, 2D fallback shell
-  state/               Zustand stores (useAppStore, useOfficeStore, useEmbeddedStore)
+  state/               Zustand stores (useAppStore, useOfficeStore, useEmbeddedStore, useNpcStore)
   config/              profile.ts, workplace.ts, quality.ts
-  content/             profile.json and other structured content (future)
+  content/             npcs.json, teams.json, dialogue/*.json — Milestone 5 data-driven content
 ```
 
 Directories for later milestones are not created until needed, per the
@@ -55,7 +60,7 @@ more complex terrain need it.
 
 ## State management
 
-Three Zustand stores:
+Four Zustand stores:
 
 - `state/useAppStore.ts` — quality profile, device class.
 - `state/useOfficeStore.ts` (Milestone 3) — door states, chair
@@ -75,6 +80,16 @@ Three Zustand stores:
   (`requestWorkAnimation`/`requestCelebration`/`completeCelebration`) at
   explicit orchestration points rather than either store polling the
   other.
+- `state/useNpcStore.ts` (Milestone 5) — the simulated world clock,
+  every NPC's runtime state (state machine state, navigation agent,
+  pending target), workstation reservations, and the active dialogue
+  session. `tick(dt)` is called once per frame
+  (`OfficeNpcPopulation.tsx`) and applies at most one state-machine
+  event per active NPC per tick — see `docs/NPC_SYSTEM.md` "Behaviour
+  orchestration". Reads `useOfficeStore`'s player-related state
+  (indirectly, via `PlayerCapsule`/`Hud`/`InteractionController`
+  checking `useNpcStore.dialogue`) but neither store depends on the
+  other's internals.
 
 Local, frame-by-frame locomotion state (position, heading, IDLE/WALK/RUN)
 stays inside R3F `useFrame` refs inside `PlayerCapsule` and is *not*
@@ -153,6 +168,19 @@ state directly from the store every frame — it has no animation state
 of its own. Nothing in this subsystem compiles, flashes, or executes
 real code; see `docs/EMBEDDED_SIMULATION.md` "Simulation boundary".
 
+## NPCs, navigation, schedules, teams, and dialogue (Milestone 5)
+
+See `docs/NPC_SYSTEM.md`, `docs/NAVIGATION_SYSTEM.md`,
+`docs/NPC_SCHEDULES.md`, `docs/TEAM_SYSTEM.md`, and
+`docs/DIALOGUE_SYSTEM.md`. Summary: a fixed, fictional 10-NPC roster
+(`content/npcs.json`) each run a role-aware schedule
+(`characters/npc/schedule.ts`) that drives a 12-state NPC state machine
+(`characters/npc/npcState.ts`) through a zone-graph navigation system
+(`navigation/`) to workstations, meetings, and breaks. `TALK_TO_NPC`
+extends the Milestone 3 interaction system; conversations run through a
+structured offline dialogue tree (`dialogue/`) with no external AI
+dependency, suspending player movement for the duration.
+
 ## Testing boundaries
 
 Per section 22, rendering itself is not unit tested. Pure logic is
@@ -170,8 +198,14 @@ selection (`selectBestInteractable`), wall collision
 machine (`reduceEmbeddedTaskState`), build/flash validation and staged
 progression, the virtual board/GPIO reducers, the timer-driven firmware
 runtime (via `vi.useFakeTimers`), the task success evaluator, achievement
-persistence, and a full integration test driving the embedded store
-end-to-end (`useEmbeddedStore.test.ts`) — 166 tests as of Milestone 4.
+persistence, a full integration test driving the embedded store
+end-to-end, the NPC state machine, team validation, navigation graph
+BFS + agent stepping, workstation reservation, schedule resolution +
+seeded variation, meeting/discussion lifecycle, dialogue node/choice
+traversal + bundled-content validation, and a full integration test
+driving `useNpcStore` end-to-end (density scaling, schedule-driven
+behaviour ticking, dialogue start/choose/end) — 249 tests as of
+Milestone 5.
 
 ## Related documentation
 
@@ -182,7 +216,13 @@ end-to-end (`useEmbeddedStore.test.ts`) — 166 tests as of Milestone 4.
 - `docs/EMBEDDED_SIMULATION.md` — firmware/build/flash/board/GPIO/runtime
 - `docs/VIRTUAL_BOARD.md` — board/GPIO model and 3D LED binding
 - `docs/WORKSTATION_IDE.md` — IDE layout, shortcuts, mobile tabs
+- `docs/NPC_SYSTEM.md` — NPC architecture, state machine, identity policy
+- `docs/NAVIGATION_SYSTEM.md` — zone graph, pathfinding, agent stepping
+- `docs/NPC_SCHEDULES.md` — world clock, schedule templates, seeded variation
+- `docs/TEAM_SYSTEM.md` — team model, validation, team-lead behaviour
+- `docs/DIALOGUE_SYSTEM.md` — dialogue content, flow, mobile UI
 - `docs/MOBILE_CONTROLS.md` — touch input architecture in detail
 - `docs/PERFORMANCE.md` — quality profile fields, DPR capping,
-  visibility-based frameloop, reduced-motion handling, office instancing
+  visibility-based frameloop, reduced-motion handling, office instancing,
+  NPC density budgets
 - `docs/ASSET_PIPELINE.md` — current (procedural-only) asset status

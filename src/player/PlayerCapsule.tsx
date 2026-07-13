@@ -9,6 +9,7 @@ import { nextAnimationState, type PlayerAnimationState } from "./animationState"
 import { PLAYER_CAPSULE_HEIGHT, PLAYER_RADIUS, SEAT_TRANSITION_DURATION_SEC } from "./PlayerConfig";
 import { resolveWallCollisions, type CollisionWall } from "@/world/office/collision";
 import { useOfficeStore } from "@/state/useOfficeStore";
+import { useNpcStore } from "@/state/useNpcStore";
 
 export function PlayerCapsule({
   getInputState,
@@ -29,6 +30,7 @@ export function PlayerCapsule({
   const transitionElapsedRef = useRef(0);
 
   const locomotionState = useOfficeStore((s) => s.chair.playerState);
+  const dialogueActive = useNpcStore((s) => s.dialogue !== null);
   const pendingTransition = useOfficeStore((s) => s.pendingTransition);
   const storeAnimationState = useOfficeStore((s) => s.playerAnimationState);
   const completeSitTransition = useOfficeStore((s) => s.completeSitTransition);
@@ -44,7 +46,18 @@ export function PlayerCapsule({
   }, [pendingTransition]);
 
   useFrame((_, dt) => {
-    if (locomotionState === "NORMAL") {
+    if (locomotionState === "NORMAL" && dialogueActive) {
+      // Dialogue (Milestone 5) suspends movement even while standing
+      // (not seated) — input is not consumed, and since the animation
+      // state machine has no TALK state yet, the documented fallback is
+      // to hold IDLE (see docs/DIALOGUE_SYSTEM.md "Player animation
+      // during dialogue").
+      const nextAnim = nextAnimationState(animStateRef.current, false, false);
+      if (nextAnim !== animStateRef.current) {
+        animStateRef.current = nextAnim;
+        onAnimationStateChange?.(nextAnim);
+      }
+    } else if (locomotionState === "NORMAL") {
       const input = getInputState();
       const next = computeNextPlayerTransform(transformRef.current, input, dt);
       const resolved = resolveWallCollisions(next, PLAYER_RADIUS, collisionWalls);

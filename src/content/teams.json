@@ -1,0 +1,47 @@
+[
+  {
+    "id": "LEADERSHIP",
+    "displayName": "Leadership",
+    "department": "Leadership",
+    "teamLeadId": null,
+    "memberIds": ["npc_ceo_001"],
+    "homeZone": "executive",
+    "meetingRoomZone": "meeting"
+  },
+  {
+    "id": "PEOPLE_OPERATIONS",
+    "displayName": "People Operations",
+    "department": "People Operations",
+    "teamLeadId": null,
+    "memberIds": ["npc_hr_001"],
+    "homeZone": "hr",
+    "meetingRoomZone": "meeting"
+  },
+  {
+    "id": "EMBEDDED_SYSTEMS",
+    "displayName": "Embedded Systems",
+    "department": "Embedded Systems",
+    "teamLeadId": "npc_teamlead_001",
+    "memberIds": ["npc_embedded_001", "npc_embedded_002"],
+    "homeZone": "embeddedLab",
+    "meetingRoomZone": "meeting"
+  },
+  {
+    "id": "SOFTWARE",
+    "displayName": "Software",
+    "department": "Software",
+    "teamLeadId": null,
+    "memberIds": ["npc_software_001", "npc_software_002"],
+    "homeZone": "engineering",
+    "meetingRoomZone": "meeting"
+  },
+  {
+    "id": "VALIDATION",
+    "displayName": "Validation",
+    "department": "Validation",
+    "teamLeadId": null,
+    "memberIds": ["npc_validation_001"],
+    "homeZone": "engineering",
+    "meetingRoomZone": "meeting"
+  }
+]

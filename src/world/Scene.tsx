@@ -14,10 +14,12 @@ import { LoadingScreen } from "@/ui/LoadingScreen";
 import { PortfolioFallback } from "@/ui/PortfolioFallback";
 import { Hud } from "@/ui/Hud";
 import { WorkstationIDE } from "@/ui/workstation/WorkstationIDE";
+import { DialogueUI } from "@/ui/dialogue/DialogueUI";
 import { Experience } from "./Experience";
 import { InputManager } from "@/engine/input/InputManager";
 import { useOfficeStore } from "@/state/useOfficeStore";
 import { useEmbeddedStore } from "@/state/useEmbeddedStore";
+import { useNpcStore } from "@/state/useNpcStore";
 
 /**
  * Scene is only ever mounted client-side (dynamic import with ssr: false
@@ -32,6 +34,7 @@ export function Scene() {
   const setQualityLevel = useAppStore((s) => s.setQualityLevel);
   const inputManager = useMemo(() => new InputManager(), []);
   const workstationActive = useOfficeStore((s) => s.workstation.mode === "ACTIVE");
+  const dialogueActive = useNpcStore((s) => s.dialogue !== null);
 
   useEffect(() => {
     if (!capability.supported) return;
@@ -96,6 +99,7 @@ export function Scene() {
       </Suspense>
       <Hud inputManager={inputManager} deviceClass={deviceClass} />
       {workstationActive && <WorkstationIDE deviceClass={deviceClass} />}
+      {dialogueActive && <DialogueUI deviceClass={deviceClass} />}
     </div>
   );
 }

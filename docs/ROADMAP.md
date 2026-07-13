@@ -40,8 +40,26 @@ Status legend: DONE / IN PROGRESS / NOT STARTED
   docs/VIRTUAL_BOARD.md, docs/WORKSTATION_IDE.md. Explicitly simulated —
   no real compiler, debug probe, or hardware is involved at any point
   (docs/EMBEDDED_SIMULATION.md "Simulation boundary").
-- **Milestone 5 — NPCs** (NOT STARTED): NPC architecture, navigation,
-  schedules, dialogue.
+- **Milestone 5 — Office NPCs, teams, navigation, schedules & dialogue**
+  (DONE): a fictional, public-safe 10-NPC roster spanning every
+  requested role (CEO, HR, Manager, Team Lead, two Embedded Engineer
+  variants, two Software Engineers, a Validation Engineer, and a
+  generic office worker); a 12-state NPC state machine with a
+  TALKING interruption/resume mechanism; five teams with validated
+  membership/team-lead references; a zone-graph + local-steering
+  navigation system (BFS pathfinding, arrival/unreachable/cancel
+  handling); role-aware schedule templates with deterministic
+  per-NPC timing variation; single-seat workstation reservation
+  (protecting the player's own workstation); a lightweight team
+  discussion/meeting lifecycle; a fully offline structured dialogue
+  system (8 role-specific content files) reachable via a new
+  `TALK_TO_NPC` interaction that suspends player movement; and
+  quality-profile-driven NPC density scaling (0/10/30/60 across
+  LOW/MEDIUM/HIGH/ULTRA). See docs/NPC_SYSTEM.md,
+  docs/NAVIGATION_SYSTEM.md, docs/NPC_SCHEDULES.md,
+  docs/TEAM_SYSTEM.md, docs/DIALOGUE_SYSTEM.md. NPCs still use the
+  same capsule-placeholder visual tier as the player (no avatar/GLB
+  pipeline — deferred Milestone 2 scope).
 - **Milestone 6 — Portfolio content** (NOT STARTED): self-introduction,
   skills, projects, EMS/BMS presentation, all config-driven.
 - **Milestone 7 — India map & city zone** (NOT STARTED): cinematic map,
