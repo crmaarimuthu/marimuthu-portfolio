@@ -53,25 +53,40 @@ pushed into Zustand every frame, to avoid unnecessary React re-renders.
 
 ## Rendering pipeline
 
-- `Canvas` (R3F) is mounted client-side only (`dynamic(() => import(...), { ssr: false })`)
-  since WebGL cannot run during Next.js server rendering.
-- A `CapabilityGate` component runs a WebGL2 feature probe before mounting
-  the Canvas. If probing fails, the app renders `PortfolioFallback` (a
-  static 2D responsive page) instead, per section 17/19.
-- `QualityProfile` (LOW/MEDIUM/HIGH/ULTRA) is auto-selected from device
-  memory, GPU tier heuristics (renderer string via `WEBGL_debug_renderer_info`
-  where available), and viewport size, with a manual override stored in
-  Zustand + persisted to `localStorage`.
+- `Canvas` (R3F) is mounted client-side only, via `SceneLoader.tsx`'s
+  `dynamic(() => import("./Scene"), { ssr: false })` — WebGL cannot run
+  during Next.js server rendering, and `next/dynamic`'s `ssr: false`
+  option must live in a Client Component, hence the small
+  `SceneLoader` wrapper around the `Scene` implementation.
+- `Scene.tsx` calls `detectCapability()` (`engine/core/capability.ts`)
+  once via a lazy `useState` initializer (safe because `Scene` only ever
+  mounts client-side). If `capability.supported` (WebGL2) is false, it
+  renders `PortfolioFallback` instead of the Canvas — see section 17/19.
+- `QualityProfile` (LOW/MEDIUM/HIGH/ULTRA, `config/quality.ts`) is
+  auto-selected by `selectInitialQualityLevel()` from device memory,
+  CPU concurrency, and touch/coarse-pointer + viewport heuristics —
+  never from screen resolution alone. A manual override is stored in
+  the Zustand store and persisted to `localStorage`
+  (`persistQualityOverride`/`readPersistedQualityOverride`); on mount,
+  `Scene` checks for a persisted override before running the heuristic.
+- The effective device pixel ratio passed to `Canvas`'s `dpr` prop is
+  `min(profile.pixelRatioCap, capability.devicePixelRatio)` — both the
+  quality profile and the real hardware DPR bound it.
+- `Canvas`'s `frameloop` toggles `"always"`/`"never"` on the Page
+  Visibility API so a backgrounded tab stops rendering; see
+  `docs/PERFORMANCE.md`.
 
 ## Input architecture
 
-`InputManager` is a framework-agnostic class that normalizes keyboard,
-pointer, and touch events into a single `InputState` (movement vector,
-run flag, interact/sit triggers, camera delta). `MobileInputController`
-(virtual joystick + touch look) and the desktop keyboard/mouse listeners
-both write into the same `InputManager`, so `PlayerController` never
-branches on device type. Device type is only used to decide which HUD
-control widgets render.
+`InputManager` (`engine/input/InputManager.ts`) is a framework-agnostic
+class that normalizes keyboard and touch/joystick input into a single
+`InputState` (movement vector, run flag, interact/sit one-shot
+triggers, camera look delta). `useKeyboardInput` (desktop) and
+`VirtualJoystick` (mobile, backed by pure dead-zone/clamp math in
+`ui/joystickMath.ts` — see `docs/MOBILE_CONTROLS.md`) both write into
+the same `InputManager` instance, so `PlayerCapsule` never branches on
+device type; `useDeviceClass` is used purely to decide which HUD
+widgets render.
 
 ## Player controller
 
@@ -86,5 +101,16 @@ with damped rotation/position.
 
 Per section 22, rendering itself is not unit tested. Pure logic is
 extracted into testable modules with no Three.js/R3F dependency:
-`InputManager` (state derivation from raw events), and player movement
-math (`computeNextPlayerState(state, input, dt)`), exercised with Vitest.
+`InputManager` (state derivation from raw events), player movement math
+(`computeNextPlayerTransform(current, input, dt)`), the animation state
+machine (`nextAnimationState`/`isTransitionAllowed`), quality selection
+and persistence (`selectInitialQualityLevel`,
+`persistQualityOverride`/`readPersistedQualityOverride`), and joystick
+dead-zone/clamp math (`normalizeJoystickDelta`) — all exercised with
+Vitest (32 tests as of Milestone 1).
+
+## Related documentation
+
+- `docs/MOBILE_CONTROLS.md` — touch input architecture in detail
+- `docs/PERFORMANCE.md` — quality profile fields, DPR capping,
+  visibility-based frameloop, reduced-motion handling
