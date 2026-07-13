@@ -69,17 +69,46 @@ toward it, removing the continuous motion some users need to avoid.
 `src/world/TestEnvironment.tsx` is deliberately tiny — one ground plane
 and three static boxes — specifically to validate the architecture
 (input → movement → camera → render) without the environment itself
-being a variable in performance testing. Later milestones' city/office
-content will be measured against this baseline.
+being a variable in performance testing. It remains alongside the
+office in Milestone 3 (the office sits further into the scene, at
+`z < -14`) as the original outdoor spawn baseline.
+
+## Office rendering cost (Milestone 3)
+
+See `docs/OFFICE_WORLD.md` "Performance" for full detail. Highlights:
+
+- **Instancing**: every office wall segment renders through one
+  `<Instances>` mesh (`OfficeStructure.tsx`) — the office has dozens of
+  wall segments but costs one draw call. Engineering/team-lead desks
+  render through `DeskCluster.tsx`'s five instanced meshes
+  (surface/frame/monitor/screen/chair) regardless of desk count.
+- **Shared materials**: `OfficeMaterials.tsx` allocates ~16 materials
+  once and reuses them across every wall, desk, door, and prop in the
+  office — no per-mesh material allocation.
+- **Collision is O(walls) per frame, not O(triangles)**: the simplified
+  circle-vs-AABB resolver (`world/office/collision.ts`) tests the player
+  against a static, precomputed wall-box list rather than raycasting
+  against real geometry.
+- **Quality-gated detail**: `environmentDetail === "LOW"` skips the
+  second embedded-lab bench; shadows are still globally gated by the
+  Canvas's `shadows` prop from Milestone 1 (`profile.shadows`), so
+  `castShadow`/`receiveShadow` flags throughout the office become no-ops
+  at LOW/MEDIUM without per-mesh branching.
+- **Zone tracking is O(zones) per frame, not per-frame allocation**:
+  `resolveOfficeZone` iterates a small fixed array of rectangles; no
+  object allocation happens unless the zone actually changes.
 
 ## Deferred, architected-for-but-not-yet-built
 
-Per the brief, these are **not** implemented in Milestone 1, but the
-current module boundaries (`engine/rendering`, `world/`, `player/` as
-separate concerns) are chosen so they can be added without restructuring:
+Per the brief, these are **not** implemented yet, but the current
+module boundaries (`engine/`, `world/`, `player/` as separate concerns)
+are chosen so they can be added without restructuring:
 
-- LOD, GPU instancing, texture compression (KTX2/Basis), Draco/Meshopt —
-  relevant once real GLB assets exist (Milestone 2+).
+- LOD, texture compression (KTX2/Basis), Draco/Meshopt — relevant once
+  real GLB assets exist (deferred "Milestone 2" avatar scope, or a
+  future office asset upgrade). See `docs/ASSET_PIPELINE.md`.
+- True camera-vs-wall collision (currently just an indoor distance
+  reduction, see `docs/OFFICE_WORLD.md`).
 - World zones / asset streaming — relevant once the city exists
   (Milestone 7+).
 - NPC/traffic density scaling against `npcBudget`/`trafficBudget` —

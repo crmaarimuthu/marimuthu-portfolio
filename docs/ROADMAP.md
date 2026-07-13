@@ -2,17 +2,31 @@
 
 Status legend: DONE / IN PROGRESS / NOT STARTED
 
-- **Milestone 1 — Foundation** (IN PROGRESS): project setup, engine ADR,
+- **Milestone 1 — Foundation** (DONE): project setup, engine ADR,
   responsive 3D canvas, capability detection, LOW/MEDIUM/HIGH/ULTRA quality
   profiles, basic test environment, third-person player capsule, desktop +
   mobile controls, camera follow, loading screen, 2D fallback shell, tests.
 - **Milestone 2 — Avatar & animation** (NOT STARTED): configurable avatar
-  integration layer, animation state machine, walk/run/idle, camera
-  improvements, interaction system.
-- **Milestone 3 — Office shell** (NOT STARTED): office exterior/interior,
-  doors, workstation, chair sit/stand.
+  integration layer (GLB/GLTF), full skinned animation clips, camera
+  orbit/collision improvements. Not implemented in this repo yet — the
+  animation *state machine* itself was extended ahead of schedule in
+  Milestone 3 (SIT_DOWN/SITTING/STAND_UP) because the office chair system
+  needed it; see docs/ANIMATION_SYSTEM.md.
+- **Milestone 3 — Realistic IT office, interior, workstation & physical
+  interactions** (DONE): office exterior/interior (10 areas: lobby,
+  engineering, embedded lab, meeting, executive/CEO, HR, manager,
+  team-lead, pantry, plus the entrance), reusable door state machine,
+  simplified AABB wall collision, general interaction system (proximity +
+  facing selection), configurable player workstation with sit/stand chair
+  flow and workstation-mode preparation, indoor camera adjustment, office
+  zone tracking, mobile context-sensitive interaction button. See
+  docs/OFFICE_WORLD.md and docs/INTERACTION_SYSTEM.md. Does **not**
+  include the embedded firmware build/flash/LED simulation (Milestone 4)
+  or a real avatar (deferred Milestone 2 scope).
 - **Milestone 4 — Embedded firmware minigame** (NOT STARTED): C code
-  viewer, build/flash state machine, real 3D LED state, celebration.
+  viewer, build/flash state machine, real 3D LED state, celebration —
+  will attach to the `boardAnchor`/`USE_WORKSTATION` seam already
+  prepared in Milestone 3.
 - **Milestone 5 — NPCs** (NOT STARTED): NPC architecture, navigation,
   schedules, dialogue.
 - **Milestone 6 — Portfolio content** (NOT STARTED): self-introduction,

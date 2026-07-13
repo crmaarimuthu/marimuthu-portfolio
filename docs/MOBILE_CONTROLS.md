@@ -4,8 +4,11 @@
 
 Desktop keyboard listeners and the mobile touch controls both write into
 a single `InputManager` instance (`src/engine/input/InputManager.ts`).
-`PlayerCapsule` only ever reads `InputManager.consumeFrameState()` — it
-has no branch for "is this a touch device," so behavior stays identical
+`InputManager.consumeFrameState()` is called exactly once per frame, by
+`Experience.tsx` (not by `PlayerCapsule` directly, as of Milestone 3 —
+see docs/ARCHITECTURE.md), and the resulting `InputState` is shared via
+a getter with both `PlayerCapsule` and `InteractionController`. Neither
+has a branch for "is this a touch device," so behavior stays identical
 regardless of which input source produced the state. This is what makes
 gamepad support (a future milestone) additive rather than a rewrite.
 
@@ -42,13 +45,29 @@ buttons. It is backed by pure, unit-tested math in
 `(pointer: coarse)` + viewport width, not user-agent sniffing alone):
 
 - Joystick, bottom-left — movement.
-- Run / Interact / Sit buttons, bottom-right — large (64px) touch
-  targets with `touchAction: "none"` to prevent scroll/zoom gestures
-  from hijacking the drag.
+- Run button + a **context-sensitive interaction button**, bottom-right
+  — large (64px) touch targets with `touchAction: "none"` to prevent
+  scroll/zoom gestures from hijacking the drag. The context button only
+  renders when `useOfficeStore.interactionPrompt` is non-null, and its
+  label (`OPEN`/`CLOSE`/`SIT`/`USE`/`EXIT`) tracks whichever intent
+  `InteractionController` currently considers nearest/valid — it is
+  hidden, not just disabled, when nothing is in range (see
+  docs/INTERACTION_SYSTEM.md).
+- A separate **STAND** button appears above the run/context pair only
+  while the player is seated (`chair.playerState === "SEATED"`),
+  positioned to avoid overlapping either the joystick or the
+  run/interact pair.
 
-Desktop shows a text control hint (WASD / Shift / E / F) instead.
+Neither button overlaps the joystick's bottom-left footprint or a
+future camera-look touch region (reserved as the remaining screen area
+above the HUD controls).
 
-## Known limitations (Milestone 1)
+Desktop shows a text control hint (WASD / Shift / E / F) plus a dynamic
+"E — <label>" prompt (and "F — Stand" while seated), both driven by the
+same `useOfficeStore.interactionPrompt`/`chair` state as the mobile
+button — the HUD never talks to the 3D scene directly.
+
+## Known limitations
 
 - No touch camera-look yet — the camera is a fixed follow rig behind
   the character. Touch-drag orbit is planned for Milestone 2.

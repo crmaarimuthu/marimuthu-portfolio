@@ -1,0 +1,74 @@
+# Player System
+
+## Status
+
+No dedicated avatar/GLB pipeline exists yet — the player is still the
+Milestone 1 capsule placeholder (`src/player/PlayerCapsule.tsx`). A
+`docs/AVATAR_PIPELINE.md`/skinned-mesh integration is future work (was
+originally scoped as "Milestone 2" but has not been implemented in this
+repo); this document describes the player *systems* (locomotion,
+config, collision, seated interaction) that exist today and that a
+future avatar swap will plug into without disturbing them.
+
+## Modules
+
+- `src/player/PlayerConfig.ts` — shared constants: capsule
+  height/radius (`PLAYER_CAPSULE_HEIGHT`, `PLAYER_RADIUS`) and the
+  sit/stand transition duration (`SEAT_TRANSITION_DURATION_SEC`).
+  Centralised so locomotion, collision, and any future avatar rigging
+  agree on the same scale.
+- `src/player/playerMovement.ts` — `computeNextPlayerTransform`, a pure
+  function of `(currentTransform, InputState, dt) -> nextTransform`.
+  Unaware of collision, chairs, or the office — it only integrates
+  walk/run speed and heading.
+- `src/world/office/collision.ts` — `resolveWallCollisions`, applied
+  *after* `computeNextPlayerTransform` each frame in
+  `PlayerCapsule.tsx`, to keep locomotion math and collision math
+  independently testable.
+- `src/player/animationState.ts` — the animation state machine (see
+  `docs/ANIMATION_SYSTEM.md`).
+- `src/player/PlayerCapsule.tsx` — the R3F component that ties the
+  above together every frame and also owns the seated-transition lerp
+  (position/heading interpolation while `TRANSITIONING`).
+- `src/player/CameraController.tsx` — third-person follow camera,
+  intentionally decoupled from `PlayerCapsule` (reads a transform
+  getter, not the component's internals).
+- `src/player/InteractionController.tsx` — resolves nearby
+  interactables and dispatches into `useOfficeStore` (see
+  `docs/INTERACTION_SYSTEM.md`); does not touch locomotion directly.
+
+## Locomotion states
+
+`PlayerCapsule` reads `chair.playerState` from `useOfficeStore` each
+frame to decide which of three modes it's in:
+
+- **`NORMAL`** — ordinary input-driven locomotion + wall collision, as
+  in Milestone 1.
+- **`TRANSITIONING`** — a short (0.35s) position/heading lerp toward
+  either the chair's sit anchor or its stand anchor; input is ignored.
+- **`SEATED`** — the player is held at the cached seat anchor; input is
+  ignored (standing is triggered externally via F, handled by
+  `InteractionController`, not by `PlayerCapsule` polling for it).
+
+This three-way split is what lets a chair "reserve → transition →
+occupy" without `PlayerCapsule` needing to know anything about chairs,
+doors, or the office layout — it only needs a target `{x, z, heading}`
+and a duration, both supplied via `useOfficeStore.pendingTransition`.
+
+## Collision
+
+Player is treated as a circle of `PLAYER_RADIUS` (0.35m) against the
+office's static AABB wall list (`useOfficeCollisionWalls()`, derived
+from `wallSegments.ts` + live door state) — see
+`docs/OFFICE_WORLD.md` "Collision (simplified)".
+
+## Why animation/office state live in `useOfficeStore`, not `PlayerCapsule` props
+
+Milestone 1's `ARCHITECTURE.md` explicitly avoids pushing per-frame
+locomotion state into Zustand (to avoid unnecessary re-renders). That
+guidance still holds: `IDLE`/`WALK`/`RUN` remain a local ref inside
+`PlayerCapsule`, updated at input-cadence, never touching React state.
+Sit/stand/workstation state is different — it changes rarely (on
+explicit player action), and multiple independent components (HUD,
+`Door`, `InteractionController`, `PlayerCapsule`) all need to read or
+react to it, which is exactly the cross-cutting case Zustand is for.
