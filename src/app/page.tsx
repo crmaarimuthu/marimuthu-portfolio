@@ -1,5 +1,5 @@
-import { SceneLoader } from "@/world/SceneLoader";
+import { PortfolioPage } from "@/ui/portfolio/PortfolioPage";
 
 export default function Home() {
-  return <SceneLoader />;
+  return <PortfolioPage />;
 }

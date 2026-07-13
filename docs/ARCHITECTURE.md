@@ -13,7 +13,7 @@ for a future milestone (e.g. vehicles) if the need arises.
 
 ```
 src/
-  app/                 Next.js routes, layout, page shell
+  app/                 Next.js routes: / = 2D portfolio page, /city = the 3D world
   engine/
     core/              Renderer/canvas bootstrap, capability detection
     input/             InputManager, useKeyboardInput
@@ -102,6 +102,9 @@ genuinely shared).
 
 ## Rendering pipeline
 
+- The 3D world lives at the **`/city`** route (`app/city/page.tsx`);
+  the root `/` is a conventional 2D portfolio page
+  (`ui/portfolio/PortfolioPage.tsx`, see docs/PORTFOLIO_CONTENT.md).
 - `Canvas` (R3F) is mounted client-side only, via `SceneLoader.tsx`'s
   `dynamic(() => import("./Scene"), { ssr: false })` — WebGL cannot run
   during Next.js server rendering, and `next/dynamic`'s `ssr: false`
