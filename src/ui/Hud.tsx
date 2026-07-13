@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import type { InputManager } from "@/engine/input/InputManager";
 import type { DeviceClass } from "@/state/useAppStore";
 import { useOfficeStore } from "@/state/useOfficeStore";
+import { useNpcStore } from "@/state/useNpcStore";
 import { VirtualJoystick } from "./VirtualJoystick";
 
 const INTENT_MOBILE_LABEL: Record<string, string> = {
@@ -13,6 +14,7 @@ const INTENT_MOBILE_LABEL: Record<string, string> = {
   USE_WORKSTATION: "USE",
   EXIT_WORKSTATION: "EXIT",
   STAND_FROM_CHAIR: "STAND",
+  TALK_TO_NPC: "TALK",
 };
 
 export function Hud({
@@ -31,8 +33,13 @@ export function Hud({
   // otherwise sit underneath the full-screen IDE panel. See
   // docs/WORKSTATION_IDE.md "Mobile input isolation".
   const workstationActive = useOfficeStore((s) => s.workstation.mode === "ACTIVE");
+  // While a dialogue session is open, the DialogueUI overlay covers the
+  // same screen region and movement is suspended (see PlayerCapsule) —
+  // same rationale as workstation mode. See docs/DIALOGUE_SYSTEM.md
+  // "Mobile dialogue".
+  const dialogueActive = useNpcStore((s) => s.dialogue !== null);
 
-  if (workstationActive) return null;
+  if (workstationActive || dialogueActive) return null;
 
   return (
     <div

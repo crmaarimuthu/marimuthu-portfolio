@@ -1,0 +1,40 @@
+{
+  "id": "manager",
+  "rootNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "npcLine": "Hey — deep in a project review. What's on your mind?",
+      "choices": [
+        { "id": "responsibility", "playerText": "What does engineering ownership look like here?", "nextNodeId": "responsibility" },
+        { "id": "execution", "playerText": "How do projects get executed?", "nextNodeId": "execution" },
+        { "id": "portfolio-owner", "playerText": "Tell me about {{profileName}}'s role.", "nextNodeId": "portfolio-owner" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "responsibility": {
+      "id": "responsibility",
+      "npcLine": "Whoever owns a feature owns it end-to-end — design, implementation, and the debugging that comes after.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "execution": {
+      "id": "execution",
+      "npcLine": "Small, reviewed changes. Embedded and software sync early, before either side is too far along.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "portfolio-owner": {
+      "id": "portfolio-owner",
+      "npcLine": "{{profileName}} works as {{profileTitle}} — you'll find him at his workstation in the engineering area.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    }
+  }
+}

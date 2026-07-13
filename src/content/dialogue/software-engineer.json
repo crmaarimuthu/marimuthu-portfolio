@@ -1,0 +1,31 @@
+{
+  "id": "software-engineer",
+  "rootNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "npcLine": "Hey! Just wrapping up a build. What's up?",
+      "choices": [
+        { "id": "toolchain", "playerText": "What's your toolchain like?", "nextNodeId": "toolchain" },
+        { "id": "integration", "playerText": "How does software integrate with the embedded side?", "nextNodeId": "integration" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "toolchain": {
+      "id": "toolchain",
+      "npcLine": "Linux day-to-day, CMake for builds, Git for everything else. Keeps things portable.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "integration": {
+      "id": "integration",
+      "npcLine": "We consume whatever the embedded side exposes over CAN or Modbus — so their interfaces and our application code have to agree early.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    }
+  }
+}

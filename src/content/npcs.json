@@ -1,0 +1,112 @@
+[
+  {
+    "id": "npc_ceo_001",
+    "displayName": "Priya",
+    "role": "CEO",
+    "department": "Leadership",
+    "teamId": "LEADERSHIP",
+    "avatarVariant": "variant-a",
+    "workstationId": "desk-ceo",
+    "scheduleTemplateId": "leadership",
+    "dialogueProfileId": "ceo"
+  },
+  {
+    "id": "npc_hr_001",
+    "displayName": "Kavya",
+    "role": "HR",
+    "department": "People Operations",
+    "teamId": "PEOPLE_OPERATIONS",
+    "avatarVariant": "variant-b",
+    "workstationId": "desk-hr",
+    "scheduleTemplateId": "hr",
+    "dialogueProfileId": "hr"
+  },
+  {
+    "id": "npc_manager_001",
+    "displayName": "Rahul",
+    "role": "MANAGER",
+    "department": "Engineering Management",
+    "teamId": null,
+    "avatarVariant": "variant-c",
+    "workstationId": "desk-manager",
+    "scheduleTemplateId": "manager",
+    "dialogueProfileId": "manager"
+  },
+  {
+    "id": "npc_teamlead_001",
+    "displayName": "Arun",
+    "role": "TEAM_LEAD",
+    "department": "Engineering",
+    "teamId": "EMBEDDED_SYSTEMS",
+    "avatarVariant": "variant-d",
+    "workstationId": "desk-teamlead",
+    "scheduleTemplateId": "team-lead",
+    "dialogueProfileId": "team-lead"
+  },
+  {
+    "id": "npc_embedded_001",
+    "displayName": "Divya",
+    "role": "EMBEDDED_FIRMWARE_ENGINEER",
+    "department": "Embedded Systems",
+    "teamId": "EMBEDDED_SYSTEMS",
+    "avatarVariant": "variant-e",
+    "workstationId": "bench-embedded-1",
+    "scheduleTemplateId": "engineer",
+    "dialogueProfileId": "embedded-engineer"
+  },
+  {
+    "id": "npc_embedded_002",
+    "displayName": "Karthik",
+    "role": "EMBEDDED_SYSTEMS_ENGINEER",
+    "department": "Embedded Systems",
+    "teamId": "EMBEDDED_SYSTEMS",
+    "avatarVariant": "variant-f",
+    "workstationId": "bench-embedded-2",
+    "scheduleTemplateId": "engineer",
+    "dialogueProfileId": "embedded-engineer"
+  },
+  {
+    "id": "npc_software_001",
+    "displayName": "Meera",
+    "role": "SOFTWARE_ENGINEER",
+    "department": "Software",
+    "teamId": "SOFTWARE",
+    "avatarVariant": "variant-g",
+    "workstationId": "desk-software-1",
+    "scheduleTemplateId": "engineer",
+    "dialogueProfileId": "software-engineer"
+  },
+  {
+    "id": "npc_software_002",
+    "displayName": "Vikram",
+    "role": "SOFTWARE_ENGINEER",
+    "department": "Software",
+    "teamId": "SOFTWARE",
+    "avatarVariant": "variant-h",
+    "workstationId": "desk-software-2",
+    "scheduleTemplateId": "engineer",
+    "dialogueProfileId": "software-engineer"
+  },
+  {
+    "id": "npc_validation_001",
+    "displayName": "Ananya",
+    "role": "TEST_VALIDATION_ENGINEER",
+    "department": "Validation",
+    "teamId": "VALIDATION",
+    "avatarVariant": "variant-i",
+    "workstationId": "desk-validation-1",
+    "scheduleTemplateId": "validation",
+    "dialogueProfileId": "validation-engineer"
+  },
+  {
+    "id": "npc_worker_001",
+    "displayName": "Suresh",
+    "role": "OFFICE_WORKER",
+    "department": "Operations",
+    "teamId": null,
+    "avatarVariant": "variant-j",
+    "workstationId": "desk-reception",
+    "scheduleTemplateId": "office-worker",
+    "dialogueProfileId": "generic"
+  }
+]

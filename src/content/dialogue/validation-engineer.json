@@ -1,0 +1,31 @@
+{
+  "id": "validation-engineer",
+  "rootNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "npcLine": "Running through a test pass right now. Happy to chat for a minute.",
+      "choices": [
+        { "id": "testing", "playerText": "What does your testing process look like?", "nextNodeId": "testing" },
+        { "id": "comms-validation", "playerText": "How do you validate communication protocols?", "nextNodeId": "comms-validation" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "testing": {
+      "id": "testing",
+      "npcLine": "System-level tests against real behaviour, not just unit tests — if the firmware claims a pin toggles, we verify it actually does.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "comms-validation": {
+      "id": "comms-validation",
+      "npcLine": "We check CAN and Modbus traffic against the expected frame timing and payload — catches a surprising number of integration bugs early.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    }
+  }
+}

@@ -16,6 +16,7 @@ import { useOfficeMaterials } from "./office/OfficeMaterials";
 import { useOfficeCollisionWalls } from "./office/useOfficeRuntime";
 import { resolveOfficeZone } from "./office/officeLayout";
 import { useOfficeStore } from "@/state/useOfficeStore";
+import { OfficeNpcPopulation } from "./office/npc/OfficeNpcPopulation";
 import type { QualityProfile } from "@/config/quality";
 
 export function Experience({
@@ -58,6 +59,7 @@ export function Experience({
       <OfficeExterior materials={materials} />
       <OfficeStructure materials={materials} />
       <OfficeInterior materials={materials} quality={quality} />
+      <OfficeNpcPopulation qualityLevel={quality.level} />
 
       <PlayerCapsule
         getInputState={getInputState}

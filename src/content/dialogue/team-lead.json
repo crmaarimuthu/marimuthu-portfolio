@@ -1,0 +1,49 @@
+{
+  "id": "team-lead",
+  "rootNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "npcLine": "Hey, welcome to the embedded corner. Want to know how we work?",
+      "choices": [
+        { "id": "workflow", "playerText": "What's the embedded development workflow like?", "nextNodeId": "workflow" },
+        { "id": "review", "playerText": "How do you handle code review?", "nextNodeId": "review" },
+        { "id": "debugging", "playerText": "Any debugging war stories?", "nextNodeId": "debugging" },
+        { "id": "portfolio-owner", "playerText": "Who's the engineer at that workstation over there?", "nextNodeId": "portfolio-owner" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "workflow": {
+      "id": "workflow",
+      "npcLine": "Write firmware, build against the target profile, flash, verify on the actual GPIO behaviour — same loop every time, just faster with practice.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "review": {
+      "id": "review",
+      "npcLine": "Every change gets a second pair of eyes before it touches a board — even a one-line GPIO fix.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "debugging": {
+      "id": "debugging",
+      "npcLine": "Most bugs aren't in the logic — they're in a misconfigured pin or a timing assumption that doesn't hold on real hardware.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "portfolio-owner": {
+      "id": "portfolio-owner",
+      "npcLine": "That's {{profileName}}'s desk — go sit down and try the firmware demo yourself.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    }
+  }
+}

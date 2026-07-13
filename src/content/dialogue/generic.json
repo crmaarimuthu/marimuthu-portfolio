@@ -1,0 +1,22 @@
+{
+  "id": "generic",
+  "rootNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "npcLine": "Hi there! Welcome to the office.",
+      "choices": [
+        { "id": "help", "playerText": "Can you help me find something?", "nextNodeId": "help" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "help": {
+      "id": "help",
+      "npcLine": "The reception desk near the entrance is a good place to start, or head into the embedded systems lab for the interesting stuff.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    }
+  }
+}

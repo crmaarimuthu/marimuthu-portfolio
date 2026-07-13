@@ -5,7 +5,9 @@ import type { InputState } from "@/engine/input/InputManager";
 import type { PlayerTransform } from "./playerMovement";
 import { selectBestInteractable } from "@/engine/interaction/InteractionSystem";
 import { useOfficeStore } from "@/state/useOfficeStore";
+import { useNpcStore } from "@/state/useNpcStore";
 import { useOfficeInteractables } from "@/world/office/useOfficeRuntime";
+import { useNpcInteractables } from "@/characters/npc/useNpcInteractables";
 import { isPointBlocked, type CollisionWall } from "@/world/office/collision";
 import { PLAYER_WORKSTATION } from "@/world/office/officeLayout";
 import { PLAYER_RADIUS } from "./PlayerConfig";
@@ -27,7 +29,8 @@ export function InteractionController({
   getPlayerTransform: () => PlayerTransform;
   collisionWalls: CollisionWall[];
 }) {
-  const candidates = useOfficeInteractables();
+  const officeCandidates = useOfficeInteractables();
+  const npcCandidates = useNpcInteractables();
   const chair = useOfficeStore((s) => s.chair);
   const setInteractionPrompt = useOfficeStore((s) => s.setInteractionPrompt);
   const dispatchDoorEvent = useOfficeStore((s) => s.dispatchDoorEvent);
@@ -35,9 +38,14 @@ export function InteractionController({
   const beginStand = useOfficeStore((s) => s.beginStand);
   const enterWorkstation = useOfficeStore((s) => s.enterWorkstation);
   const exitWorkstationMode = useOfficeStore((s) => s.exitWorkstationMode);
+  const startDialogue = useNpcStore((s) => s.startDialogue);
+  const dialogueActive = useNpcStore((s) => s.dialogue !== null);
 
   useFrame(() => {
+    if (dialogueActive) return;
+
     const player = getPlayerTransform();
+    const candidates = [...officeCandidates, ...npcCandidates];
     const best = selectBestInteractable(player, candidates);
 
     const currentPrompt = useOfficeStore.getState().interactionPrompt;
@@ -65,6 +73,9 @@ export function InteractionController({
           exitWorkstationMode();
           break;
         case "STAND_FROM_CHAIR":
+          break;
+        case "TALK_TO_NPC":
+          startDialogue(best.id);
           break;
       }
     }

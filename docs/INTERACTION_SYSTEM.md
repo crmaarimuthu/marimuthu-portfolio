@@ -31,7 +31,7 @@ calls `selectBestInteractable`, and publishes the result to
 context-sensitive button (mobile) without any HUD component needing to
 know about the 3D scene.
 
-## Intents (Milestone 3)
+## Intents
 
 | Intent | Trigger | Effect |
 |---|---|---|
@@ -41,6 +41,19 @@ know about the 3D scene.
 | `USE_WORKSTATION` | E, seated & workstation `INACTIVE` | `enterWorkstation()` |
 | `EXIT_WORKSTATION` | E, seated & workstation `ACTIVE` | `exitWorkstationMode()` |
 | `STAND_FROM_CHAIR` | **F** (dedicated shortcut, not E-selected) | `beginStand(anchor)` if the stand anchor is clear |
+| `TALK_TO_NPC` (Milestone 5) | E, NPC in an interruptible state | `useNpcStore.startDialogue(npcId)` |
+
+`TALK_TO_NPC` candidates come from a second candidate list,
+`useNpcInteractables()` (`characters/npc/useNpcInteractables.ts`), built
+the same way `useOfficeInteractables()` builds door/chair/workstation
+candidates. `InteractionController` concatenates both lists before
+calling `selectBestInteractable` — an NPC standing right next to an open
+door competes for "nearest" on equal footing with the door itself, which
+is the intended behaviour (whichever is actually closer/more in front of
+the player wins). See `docs/DIALOGUE_SYSTEM.md` for the full
+conversation flow, including why the candidate list becomes empty while
+a dialogue session is already open (preventing a second simultaneous
+conversation).
 
 **Why standing is F, not an E-selected candidate:** once seated, the
 player's own chair is the only thing they could possibly mean — there's

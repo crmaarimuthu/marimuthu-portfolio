@@ -4,7 +4,8 @@ export type InteractionIntent =
   | "SIT_AT_CHAIR"
   | "STAND_FROM_CHAIR"
   | "USE_WORKSTATION"
-  | "EXIT_WORKSTATION";
+  | "EXIT_WORKSTATION"
+  | "TALK_TO_NPC";
 
 export interface InteractableDescriptor {
   id: string;

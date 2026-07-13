@@ -77,6 +77,15 @@ region and normal locomotion is already paused (the player is
 tab bar; see `docs/WORKSTATION_IDE.md` "Mobile layout" and "Mobile
 input isolation".
 
+## Dialogue mode (Milestone 5)
+
+The mobile `TALK` context button (`INTENT_MOBILE_LABEL.TALK_TO_NPC`)
+appears exactly like any other context-sensitive button when an NPC is
+in range. Once a conversation starts, `Hud.tsx` hides entirely (same
+`workstationActive`-style check, now also gated on `useNpcStore.dialogue
+!== null`) and `DialogueUI`'s bottom-sheet layout takes over the same
+screen region — see `docs/DIALOGUE_SYSTEM.md` "Mobile UI".
+
 ## Known limitations
 
 - No touch camera-look yet — the camera is a fixed follow rig behind

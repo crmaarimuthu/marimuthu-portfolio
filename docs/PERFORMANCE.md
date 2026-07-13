@@ -126,6 +126,32 @@ detail. Highlights:
   the same Page Visibility listener that already toggles the R3F
   `frameloop` (`Scene.tsx`), so a backgrounded tab doesn't keep ticking.
 
+## NPC population cost (Milestone 5)
+
+See `docs/NPC_SYSTEM.md` "Density scaling & update budgets" for full
+detail. Highlights:
+
+- **Explicit density budgets, not open-ended spawning**: `useNpcStore
+  .setActiveBudget(qualityLevel)` reuses `QUALITY_PROFILES[level]
+  .npcBudget` (already defined since Milestone 1) — `LOW` spawns **zero**
+  NPCs, `MEDIUM`/`HIGH`/`ULTRA` spawn progressively more of a fixed,
+  small (10-NPC) roster. Nothing outside `activeNpcIds` is ticked or
+  rendered.
+- **Direct-read position binding**: `NPCInstance.tsx` reads its NPC's
+  position/state from `useNpcStore.getState()` inside `useFrame` — the
+  same direct-read pattern as `EmbeddedBoard3D`'s GPIO binding — so
+  per-frame navigation movement never triggers a React re-render.
+- **Cached NPC profile lookups**: `NPC_PROFILES` is loaded and validated
+  once at module import time (`npcContent.ts`), not re-parsed from JSON
+  per frame or per lookup.
+- **No per-NPC dynamic lights**: NPCs are flat-shaded capsules with a
+  role-tinted material and an optional emissive tint while `TALKING` —
+  no light source is attached to any NPC.
+- **One `tick()` call for the whole population**, not one `useFrame`
+  subscription per NPC — `OfficeNpcPopulation.tsx` ticks
+  `useNpcStore` once per frame; the store internally loops over
+  `activeNpcIds`.
+
 ## Deferred, architected-for-but-not-yet-built
 
 Per the brief, these are **not** implemented yet, but the current
@@ -139,8 +165,11 @@ are chosen so they can be added without restructuring:
   reduction, see `docs/OFFICE_WORLD.md`).
 - World zones / asset streaming — relevant once the city exists
   (Milestone 7+).
-- NPC/traffic density scaling against `npcBudget`/`trafficBudget` —
-  relevant once NPCs/vehicles exist (Milestones 5, 9).
+- `npcBudget` is implemented and in use (Milestone 5, see above);
+  `trafficBudget` remains unused until vehicles/pedestrians exist
+  (Milestone 9).
+- NPC local avoidance / crowd separation — deferred, see
+  `docs/NAVIGATION_SYSTEM.md` "Local avoidance".
 - Web Workers for simulation — relevant once a simulation loop (EMS/BMS,
   Milestone 6+) exists that's heavy enough to justify moving off the
   main thread.

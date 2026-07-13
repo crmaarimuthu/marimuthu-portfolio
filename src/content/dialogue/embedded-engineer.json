@@ -1,0 +1,40 @@
+{
+  "id": "embedded-engineer",
+  "rootNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "npcLine": "Careful, I've got a board half-wired on the bench. What can I help with?",
+      "choices": [
+        { "id": "stack", "playerText": "What's your usual tech stack?", "nextNodeId": "stack" },
+        { "id": "comms", "playerText": "Which comms protocols do you work with?", "nextNodeId": "comms" },
+        { "id": "debugging", "playerText": "How do you debug embedded issues?", "nextNodeId": "debugging" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "stack": {
+      "id": "stack",
+      "npcLine": "C and Embedded C mostly, targeting MCUs like the XMC4800 and STM32 families.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "comms": {
+      "id": "comms",
+      "npcLine": "CAN and RS485 for the physical layer, Modbus RTU and Modbus TCP on top depending on the system.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    },
+    "debugging": {
+      "id": "debugging",
+      "npcLine": "Logic analyzer first, then a debugger session if the timing looks suspicious. Try the workstation over there — it runs a small build/flash/GPIO demo.",
+      "choices": [
+        { "id": "back", "playerText": "Ask something else.", "nextNodeId": "root" },
+        { "id": "exit", "playerText": "Thanks, that's all for now.", "nextNodeId": null }
+      ]
+    }
+  }
+}
