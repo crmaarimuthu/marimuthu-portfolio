@@ -48,12 +48,21 @@ frame to decide which of three modes it's in:
   either the chair's sit anchor or its stand anchor; input is ignored.
 - **`SEATED`** — the player is held at the cached seat anchor; input is
   ignored (standing is triggered externally via F, handled by
-  `InteractionController`, not by `PlayerCapsule` polling for it).
+  `InteractionController`, not by `PlayerCapsule` polling for it). This
+  is also the locomotion mode for the entire Milestone 4 workstation
+  session (`TYPE`/`DEBUG`/`INSPECT_BOARD`/`CELEBRATE` animation states
+  all occur while `chair.playerState` stays `SEATED` — only the
+  animation sub-state changes, not the locomotion mode).
 
 This three-way split is what lets a chair "reserve → transition →
 occupy" without `PlayerCapsule` needing to know anything about chairs,
 doors, or the office layout — it only needs a target `{x, z, heading}`
-and a duration, both supplied via `useOfficeStore.pendingTransition`.
+and a duration, both supplied via `useOfficeStore.pendingTransition`. It
+is also what let the embedded firmware task (Milestone 4) reuse the
+exact same `SEATED` handling without any change to `PlayerCapsule`:
+`useEmbeddedStore` only ever calls `useOfficeStore.requestWorkAnimation`
+to change *which* seated animation is showing, never the chair/
+locomotion state itself.
 
 ## Collision
 

@@ -82,7 +82,18 @@ export function PlayerCapsule({
       }
     }
 
-    const seatedVisual = animStateRef.current === "SITTING" || animStateRef.current === "SIT_DOWN" || animStateRef.current === "STAND_UP";
+    // Every state reachable while the player remains physically seated
+    // (Milestone 3 sit/stand plus Milestone 4 workstation-activity
+    // states, all of which only exist as children of SITTING in
+    // animationState.ts) uses the same lowered/scaled seated visual.
+    const seatedVisual =
+      animStateRef.current === "SITTING" ||
+      animStateRef.current === "SIT_DOWN" ||
+      animStateRef.current === "STAND_UP" ||
+      animStateRef.current === "TYPE" ||
+      animStateRef.current === "DEBUG" ||
+      animStateRef.current === "INSPECT_BOARD" ||
+      animStateRef.current === "CELEBRATE";
 
     if (groupRef.current) {
       groupRef.current.position.set(

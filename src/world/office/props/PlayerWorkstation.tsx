@@ -2,6 +2,7 @@
 
 import { PLAYER_WORKSTATION } from "../officeLayout";
 import type { OfficeMaterials } from "../OfficeMaterials";
+import { EmbeddedBoard3D } from "./EmbeddedBoard3D";
 
 /**
  * The player's own configurable engineering workstation
@@ -9,8 +10,9 @@ import type { OfficeMaterials } from "../OfficeMaterials";
  * non-instanced component (unlike the generic desk clusters) so its
  * interaction anchors (chair sit/stand, camera target, embedded board)
  * are easy to locate and reason about — see docs/OFFICE_WORLD.md
- * "Workstation anchors". Milestone 4 will attach the actual firmware
- * build/flash/LED simulation to `boardAnchor`.
+ * "Workstation anchors". The embedded board at `boardAnchor` runs the
+ * Milestone 4 firmware build/flash/LED simulation — see
+ * docs/VIRTUAL_BOARD.md.
  */
 export function PlayerWorkstation({ materials }: { materials: OfficeMaterials }) {
   const [dx, , dz] = PLAYER_WORKSTATION.deskPosition;
@@ -55,9 +57,7 @@ export function PlayerWorkstation({ materials }: { materials: OfficeMaterials })
       </mesh>
 
       {/* Embedded development board (interaction anchor point) */}
-      <mesh position={PLAYER_WORKSTATION.boardAnchor} material={materials.accent} castShadow>
-        <boxGeometry args={[0.22, 0.03, 0.16]} />
-      </mesh>
+      <EmbeddedBoard3D position={PLAYER_WORKSTATION.boardAnchor} materials={materials} />
 
       {/* Debug/programming device */}
       <mesh position={[dx + 0.35, 0.79, dz - 0.18]} material={materials.equipment}>

@@ -35,9 +35,12 @@ src/
   dialogue/            (future milestones)
   portfolio/           Config-driven content panels (future milestones)
   simulations/
-    embedded/ can/ modbus/ ems/ bms/            (future milestones)
-  ui/                  HUD, loading screen, menus, 2D fallback shell
-  state/               Zustand stores (useAppStore, useOfficeStore)
+    embedded/          Firmware/build/flash/board/GPIO/runtime domain logic — Milestone 4 (see docs/EMBEDDED_SIMULATION.md)
+    can/ modbus/ ems/ bms/            (future milestones)
+  ui/
+    workstation/       Embedded IDE overlay (CodeViewer, Build/Flash/Board panels) — Milestone 4
+    HUD, loading screen, 2D fallback shell
+  state/               Zustand stores (useAppStore, useOfficeStore, useEmbeddedStore)
   config/              profile.ts, workplace.ts, quality.ts
   content/             profile.json and other structured content (future)
 ```
@@ -52,15 +55,26 @@ more complex terrain need it.
 
 ## State management
 
-Two Zustand stores:
+Three Zustand stores:
 
 - `state/useAppStore.ts` — quality profile, device class.
 - `state/useOfficeStore.ts` (Milestone 3) — door states, chair
-  reservation/occupancy, workstation mode, current zone, and the active
-  interaction prompt. This is genuinely cross-cutting state: the HUD,
-  `Door` props, `InteractionController`, and `PlayerCapsule` all need to
-  read or react to it, and it changes rarely (on explicit player
-  action) — unlike locomotion.
+  reservation/occupancy, workstation mode, current zone, the active
+  interaction prompt, and the shared player animation state. This is
+  genuinely cross-cutting state: the HUD, `Door` props,
+  `InteractionController`, and `PlayerCapsule` all need to read or react
+  to it, and it changes rarely (on explicit player action) — unlike
+  locomotion.
+- `state/useEmbeddedStore.ts` (Milestone 4) — the embedded firmware task
+  state machine, build/flash staged progression + output logs, the
+  virtual board/GPIO state, and achievement/notification state. Owns
+  side-effect resources (the `VirtualFirmwareRuntime` instance, staged
+  `setTimeout` chains) as module-scoped variables rather than store
+  state — see `docs/EMBEDDED_SIMULATION.md` "Runtime lifecycle". Calls
+  into `useOfficeStore`'s animation-bridge actions
+  (`requestWorkAnimation`/`requestCelebration`/`completeCelebration`) at
+  explicit orchestration points rather than either store polling the
+  other.
 
 Local, frame-by-frame locomotion state (position, heading, IDLE/WALK/RUN)
 stays inside R3F `useFrame` refs inside `PlayerCapsule` and is *not*
@@ -125,20 +139,39 @@ and dispatches into `useOfficeStore` (doors, chair sit/stand,
 workstation mode). The HUD reads `useOfficeStore.interactionPrompt`
 directly — no prop drilling from the 3D scene into the DOM HUD.
 
+## Embedded firmware simulation (Milestone 4)
+
+See `docs/EMBEDDED_SIMULATION.md`, `docs/VIRTUAL_BOARD.md`, and
+`docs/WORKSTATION_IDE.md`. Summary: entering workstation mode (Milestone
+3's `USE_WORKSTATION`) mounts `WorkstationIDE.tsx` (a DOM overlay, same
+pattern as `Hud.tsx`), which drives `useEmbeddedStore` through a
+deterministic task state machine (`NOT_STARTED → … → COMPLETED`)
+layered over independent build/flash staged-progression simulators, a
+pure virtual board/GPIO reducer, and a timer-driven
+`VirtualFirmwareRuntime`. The 3D LED (`EmbeddedBoard3D.tsx`) reads GPIO
+state directly from the store every frame — it has no animation state
+of its own. Nothing in this subsystem compiles, flashes, or executes
+real code; see `docs/EMBEDDED_SIMULATION.md` "Simulation boundary".
+
 ## Testing boundaries
 
 Per section 22, rendering itself is not unit tested. Pure logic is
 extracted into testable modules with no Three.js/R3F dependency:
 `InputManager` (state derivation from raw events), player movement math
 (`computeNextPlayerTransform`), the animation state machine
-(`nextAnimationState`/`isTransitionAllowed`/sit-stand transitions),
-quality selection and persistence, joystick dead-zone/clamp math,
-office zone classification (`resolveOfficeZone`), the door state
-machine (`reduceDoorState`), chair reservation/occupancy
+(`nextAnimationState`/`isTransitionAllowed`/sit-stand/work-activity
+transitions), quality selection and persistence, joystick dead-zone/
+clamp math, office zone classification (`resolveOfficeZone`), the door
+state machine (`reduceDoorState`), chair reservation/occupancy
 (`requestSit`/`requestStand`/...), workstation mode
 (`requestUseWorkstation`/`exitWorkstation`), interaction target
-selection (`selectBestInteractable`), and wall collision
-(`resolveWallCollisions`/`isPointBlocked`) — 91 tests as of Milestone 3.
+selection (`selectBestInteractable`), wall collision
+(`resolveWallCollisions`/`isPointBlocked`), the embedded task state
+machine (`reduceEmbeddedTaskState`), build/flash validation and staged
+progression, the virtual board/GPIO reducers, the timer-driven firmware
+runtime (via `vi.useFakeTimers`), the task success evaluator, achievement
+persistence, and a full integration test driving the embedded store
+end-to-end (`useEmbeddedStore.test.ts`) — 166 tests as of Milestone 4.
 
 ## Related documentation
 
@@ -146,6 +179,9 @@ selection (`selectBestInteractable`), and wall collision
 - `docs/ANIMATION_SYSTEM.md` — animation state machine detail
 - `docs/OFFICE_WORLD.md` — office layout, doors, collision, camera
 - `docs/INTERACTION_SYSTEM.md` — target selection, chair/workstation flow
+- `docs/EMBEDDED_SIMULATION.md` — firmware/build/flash/board/GPIO/runtime
+- `docs/VIRTUAL_BOARD.md` — board/GPIO model and 3D LED binding
+- `docs/WORKSTATION_IDE.md` — IDE layout, shortcuts, mobile tabs
 - `docs/MOBILE_CONTROLS.md` — touch input architecture in detail
 - `docs/PERFORMANCE.md` — quality profile fields, DPR capping,
   visibility-based frameloop, reduced-motion handling, office instancing

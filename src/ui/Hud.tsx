@@ -25,6 +25,14 @@ export function Hud({
   const isTouchDevice = deviceClass === "MOBILE" || deviceClass === "TABLET";
   const interactionPrompt = useOfficeStore((s) => s.interactionPrompt);
   const seated = useOfficeStore((s) => s.chair.playerState === "SEATED");
+  // While the workstation IDE overlay is open, movement/interaction
+  // controls are hidden — normal locomotion is already paused (the
+  // player is SEATED), and the joystick/context-button footprint would
+  // otherwise sit underneath the full-screen IDE panel. See
+  // docs/WORKSTATION_IDE.md "Mobile input isolation".
+  const workstationActive = useOfficeStore((s) => s.workstation.mode === "ACTIVE");
+
+  if (workstationActive) return null;
 
   return (
     <div

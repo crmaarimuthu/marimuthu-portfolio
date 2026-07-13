@@ -98,6 +98,34 @@ See `docs/OFFICE_WORLD.md` "Performance" for full detail. Highlights:
   `resolveOfficeZone` iterates a small fixed array of rectangles; no
   object allocation happens unless the zone actually changes.
 
+## Embedded simulation cost (Milestone 4)
+
+See `docs/EMBEDDED_SIMULATION.md` and `docs/VIRTUAL_BOARD.md` for full
+detail. Highlights:
+
+- **No React state updates per animation frame**: the 3D LED
+  (`EmbeddedBoard3D.tsx`) reads GPIO state via
+  `useEmbeddedStore.getState()` inside `useFrame` — a direct read, not a
+  subscribed hook — so a GPIO toggle only mutates a material property,
+  never triggers a React re-render of the 3D tree. The board *status
+  panel* (DOM, `BoardStatusPanel.tsx`) does use a subscribed hook, since
+  DOM text genuinely needs to re-render on each toggle — but that's
+  cheap (a small text diff), unlike a full R3F re-render.
+- **No duplicate timers**: `VirtualFirmwareRuntime.start()` is a no-op
+  if already running; every `useEmbeddedStore` action that starts a new
+  build/flash/runtime first clears any prior timer/runtime instance.
+- **No dynamic point light on the LED** — an emissive material change
+  alone is enough at workstation viewing distance, avoiding a real-time
+  light regardless of quality profile (see `docs/VIRTUAL_BOARD.md`).
+- **No syntax-highlighting library dependency**: `cSyntaxHighlight.ts`
+  is a ~40-line regex tokenizer instead of Prism/CodeMirror/Monaco,
+  evaluated and rejected specifically on bundle-size grounds for a
+  single fixed read-only file — see `docs/WORKSTATION_IDE.md` "Code
+  viewer".
+- **Visibility-aware runtime**: the blink timer is paused/resumed by
+  the same Page Visibility listener that already toggles the R3F
+  `frameloop` (`Scene.tsx`), so a backgrounded tab doesn't keep ticking.
+
 ## Deferred, architected-for-but-not-yet-built
 
 Per the brief, these are **not** implemented yet, but the current

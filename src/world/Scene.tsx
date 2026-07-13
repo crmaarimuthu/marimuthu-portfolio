@@ -13,8 +13,11 @@ import { useDeviceClass } from "@/engine/core/useDeviceClass";
 import { LoadingScreen } from "@/ui/LoadingScreen";
 import { PortfolioFallback } from "@/ui/PortfolioFallback";
 import { Hud } from "@/ui/Hud";
+import { WorkstationIDE } from "@/ui/workstation/WorkstationIDE";
 import { Experience } from "./Experience";
 import { InputManager } from "@/engine/input/InputManager";
+import { useOfficeStore } from "@/state/useOfficeStore";
+import { useEmbeddedStore } from "@/state/useEmbeddedStore";
 
 /**
  * Scene is only ever mounted client-side (dynamic import with ssr: false
@@ -28,6 +31,7 @@ export function Scene() {
   const qualityLevel = useAppStore((s) => s.qualityLevel);
   const setQualityLevel = useAppStore((s) => s.setQualityLevel);
   const inputManager = useMemo(() => new InputManager(), []);
+  const workstationActive = useOfficeStore((s) => s.workstation.mode === "ACTIVE");
 
   useEffect(() => {
     if (!capability.supported) return;
@@ -49,7 +53,17 @@ export function Scene() {
 
   useEffect(() => {
     function handleVisibilityChange() {
-      setDocumentVisible(document.visibilityState === "visible");
+      const visible = document.visibilityState === "visible";
+      setDocumentVisible(visible);
+      // The embedded firmware runtime (Milestone 4) drives a real
+      // setInterval; pause/resume it in lockstep with the render loop
+      // so a backgrounded tab doesn't silently keep "blinking" (and
+      // potentially reach task success) while the player isn't there.
+      if (visible) {
+        useEmbeddedStore.getState().resumeRuntimeForVisibility();
+      } else {
+        useEmbeddedStore.getState().pauseRuntimeForVisibility();
+      }
     }
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -81,6 +95,7 @@ export function Scene() {
         </Canvas>
       </Suspense>
       <Hud inputManager={inputManager} deviceClass={deviceClass} />
+      {workstationActive && <WorkstationIDE deviceClass={deviceClass} />}
     </div>
   );
 }
