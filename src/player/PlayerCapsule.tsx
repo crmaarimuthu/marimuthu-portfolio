@@ -14,13 +14,19 @@ import { PersonAvatar } from "@/characters/avatar/PersonAvatar";
 
 const MOVING_ANIM_STATES = new Set<PlayerAnimationState>(["WALK", "RUN"]);
 
+/** Simple arcade-style jump — no animation clip is available (see PersonAvatar.tsx), so this is a visual hop only. */
+const GRAVITY = -18; // m/s^2
+const JUMP_SPEED = 6; // m/s, initial upward velocity
+
 export function PlayerCapsule({
   getInputState,
+  getCameraYaw,
   collisionWalls = [],
   onTransformChange,
   onAnimationStateChange,
 }: {
   getInputState: () => InputState;
+  getCameraYaw?: () => number;
   collisionWalls?: CollisionWall[];
   onTransformChange?: (t: PlayerTransform) => void;
   onAnimationStateChange?: (s: PlayerAnimationState) => void;
@@ -32,6 +38,8 @@ export function PlayerCapsule({
   const transitionStartRef = useRef<PlayerTransform>({ x: 0, z: 0, heading: 0 });
   const transitionElapsedRef = useRef(0);
   const isMovingRef = useRef(false);
+  const jumpHeightRef = useRef(0);
+  const jumpVelocityRef = useRef(0);
 
   const locomotionState = useOfficeStore((s) => s.chair.playerState);
   const dialogueActive = useNpcStore((s) => s.dialogue !== null);
@@ -63,7 +71,8 @@ export function PlayerCapsule({
       }
     } else if (locomotionState === "NORMAL") {
       const input = getInputState();
-      const next = computeNextPlayerTransform(transformRef.current, input, dt);
+      const cameraYaw = getCameraYaw?.() ?? 0;
+      const next = computeNextPlayerTransform(transformRef.current, input, dt, cameraYaw);
       const resolved = resolveWallCollisions(next, PLAYER_RADIUS, collisionWalls);
       transformRef.current = { x: resolved.x, z: resolved.z, heading: next.heading };
 
@@ -73,7 +82,25 @@ export function PlayerCapsule({
         animStateRef.current = nextAnim;
         onAnimationStateChange?.(nextAnim);
       }
-    } else if (locomotionState === "TRANSITIONING" && pendingTransition) {
+
+      // Simple arcade jump: only while grounded and not mid-interaction.
+      const grounded = jumpHeightRef.current <= 0 && jumpVelocityRef.current <= 0;
+      if (input.jumpPressed && grounded) {
+        jumpVelocityRef.current = JUMP_SPEED;
+      }
+      jumpVelocityRef.current += GRAVITY * dt;
+      jumpHeightRef.current += jumpVelocityRef.current * dt;
+      if (jumpHeightRef.current < 0) {
+        jumpHeightRef.current = 0;
+        jumpVelocityRef.current = 0;
+      }
+    } else {
+      // Landed mid-jump if a chair/dialogue interaction interrupts it.
+      jumpHeightRef.current = 0;
+      jumpVelocityRef.current = 0;
+    }
+
+    if (locomotionState === "TRANSITIONING" && pendingTransition) {
       transitionElapsedRef.current += dt;
       const t = Math.min(1, transitionElapsedRef.current / SEAT_TRANSITION_DURATION_SEC);
       const start = transitionStartRef.current;
@@ -104,12 +131,13 @@ export function PlayerCapsule({
     if (groupRef.current) {
       // The real-person model's root sits at the feet (ground level),
       // unlike the old capsule placeholder which was centered on the
-      // body — so the group stays at y=0 rather than at a half-height
-      // offset. There is no sit animation clip available (see
-      // characters/avatar/PersonAvatar.tsx), so seated states currently
-      // still render the character standing at the seat position —
-      // a documented known limitation, not a fabricated pose.
-      groupRef.current.position.set(transformRef.current.x, 0, transformRef.current.z);
+      // body — so the group stays at y=0 (plus any jump height) rather
+      // than at a half-height offset. There is no sit animation clip
+      // available (see characters/avatar/PersonAvatar.tsx), so seated
+      // states currently still render the character standing at the
+      // seat position — a documented known limitation, not a
+      // fabricated pose.
+      groupRef.current.position.set(transformRef.current.x, jumpHeightRef.current, transformRef.current.z);
       groupRef.current.rotation.y = transformRef.current.heading;
     }
     onTransformChange?.(transformRef.current);

@@ -6,6 +6,7 @@ import type { DeviceClass } from "@/state/useAppStore";
 import { useOfficeStore } from "@/state/useOfficeStore";
 import { useNpcStore } from "@/state/useNpcStore";
 import { VirtualJoystick } from "./VirtualJoystick";
+import { TouchLookArea } from "./TouchLookArea";
 
 const INTENT_MOBILE_LABEL: Record<string, string> = {
   OPEN_DOOR: "OPEN",
@@ -62,7 +63,8 @@ export function Hud({
             lineHeight: 1.6,
           }}
         >
-          <div>WASD move &middot; Shift run &middot; E interact &middot; F sit/stand</div>
+          <div>WASD move &middot; Shift run &middot; Space jump &middot; E interact &middot; F sit/stand</div>
+          <div>Click the scene, then move the mouse to look around (360&deg;) &middot; Esc releases the cursor</div>
         </div>
       )}
 
@@ -71,6 +73,12 @@ export function Hud({
       )}
       {!isTouchDevice && seated && (
         <div style={{ ...desktopPromptStyle, bottom: 84 }}>F &mdash; Stand</div>
+      )}
+
+      {/* Rendered before the joystick/buttons below so it sits underneath
+          them in stacking order — see TouchLookArea.tsx. */}
+      {isTouchDevice && (
+        <TouchLookArea onLookDelta={(dx, dy) => inputManager.addLookDelta(dx * 2.2, dy * 2.2)} />
       )}
 
       {isTouchDevice && (
@@ -106,6 +114,9 @@ export function Hud({
               style={buttonStyle}
             >
               Run
+            </button>
+            <button onPointerDown={() => inputManager.triggerJump()} style={buttonStyle}>
+              Jump
             </button>
             {interactionPrompt && (
               <button onPointerDown={() => inputManager.triggerInteract()} style={contextButtonStyle}>

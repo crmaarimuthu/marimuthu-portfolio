@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { PlayerCapsule } from "@/player/PlayerCapsule";
 import { CameraController } from "@/player/CameraController";
+import { MouseLookController } from "@/player/MouseLookController";
 import { InteractionController } from "@/player/InteractionController";
 import type { PlayerTransform } from "@/player/playerMovement";
 import { TestEnvironment } from "./TestEnvironment";
@@ -16,6 +17,7 @@ import { useOfficeMaterials } from "./office/OfficeMaterials";
 import { useOfficeCollisionWalls } from "./office/useOfficeRuntime";
 import { resolveOfficeZone } from "./office/officeLayout";
 import { useOfficeStore } from "@/state/useOfficeStore";
+import { useNpcStore } from "@/state/useNpcStore";
 import { OfficeNpcPopulation } from "./office/npc/OfficeNpcPopulation";
 import type { QualityProfile } from "@/config/quality";
 
@@ -32,10 +34,13 @@ export function Experience({
   const transformRef = useRef<PlayerTransform>({ x: 0, z: 0, heading: 0 });
   const inputStateRef = useRef<InputState>(emptyInputState());
   const lastZoneRef = useRef<string | null>(null);
+  const cameraYawRef = useRef(0);
 
   const materials = useOfficeMaterials();
   const collisionWalls = useOfficeCollisionWalls();
   const setZone = useOfficeStore((s) => s.setZone);
+  const workstationActive = useOfficeStore((s) => s.workstation.mode === "ACTIVE");
+  const dialogueActive = useNpcStore((s) => s.dialogue !== null);
 
   // Subscribed first (Experience mounts before its children), so this
   // consumes the frame's input state before PlayerCapsule/
@@ -63,6 +68,7 @@ export function Experience({
 
       <PlayerCapsule
         getInputState={getInputState}
+        getCameraYaw={() => cameraYawRef.current}
         collisionWalls={collisionWalls}
         onTransformChange={(t) => {
           transformRef.current = t;
@@ -73,7 +79,15 @@ export function Experience({
         getPlayerTransform={getPlayerTransform}
         collisionWalls={collisionWalls}
       />
-      <CameraController getTransform={getPlayerTransform} reducedMotion={reducedMotion} />
+      <CameraController
+        getTransform={getPlayerTransform}
+        getInputState={getInputState}
+        onYawChange={(yaw) => {
+          cameraYawRef.current = yaw;
+        }}
+        reducedMotion={reducedMotion}
+      />
+      <MouseLookController inputManager={inputManager} enabled={!workstationActive && !dialogueActive} />
     </>
   );
 }
