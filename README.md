@@ -19,8 +19,14 @@ earlier capsule placeholder; only two distinct people are available at
 that free tier, so individuals are differentiated by a clothing tint,
 and each has only one baked animation clip (see
 [`docs/NPC_SYSTEM.md`](docs/NPC_SYSTEM.md) "Avatar variation" for exactly
-what that does and doesn't cover). A richer configurable avatar/GLB
-pipeline (Milestone 2) remains future work; see `docs/ROADMAP.md`.
+what that does and doesn't cover). The office now sits inside an
+**open city block** — roads, sidewalks, Kenney CC0 buildings, trees,
+street lamps, walking pedestrians, ambient traffic, and **drivable
+vehicles** (the player's own car and bike on the office forecourt plus
+street-parked variety; walk up and press E to drive, GTA-style) — see
+[`docs/CITY_WORLD.md`](docs/CITY_WORLD.md). A richer configurable
+avatar/GLB pipeline (Milestone 2) remains future work; see
+`docs/ROADMAP.md`.
 
 ## Documentation
 
@@ -30,6 +36,7 @@ pipeline (Milestone 2) remains future work; see `docs/ROADMAP.md`.
 - [`docs/PLAYER_SYSTEM.md`](docs/PLAYER_SYSTEM.md) — locomotion, collision, config
 - [`docs/ANIMATION_SYSTEM.md`](docs/ANIMATION_SYSTEM.md) — animation state machine
 - [`docs/OFFICE_WORLD.md`](docs/OFFICE_WORLD.md) — office layout, doors, collision, camera
+- [`docs/CITY_WORLD.md`](docs/CITY_WORLD.md) — open city block, drivable vehicles, traffic, pedestrians
 - [`docs/INTERACTION_SYSTEM.md`](docs/INTERACTION_SYSTEM.md) — target selection, chair/workstation flow
 - [`docs/EMBEDDED_SIMULATION.md`](docs/EMBEDDED_SIMULATION.md) — firmware project, build/flash simulators, runtime, success/achievement (**read this for the simulation boundary — nothing here is real hardware/compilation**)
 - [`docs/VIRTUAL_BOARD.md`](docs/VIRTUAL_BOARD.md) — virtual board/GPIO model and the 3D LED binding
@@ -64,8 +71,10 @@ portfolio landing page (hero, tech stack, skills, projects, experience,
 contact); the interactive 3D world lives at
 [http://localhost:3000/city](http://localhost:3000/city), linked from
 the page's "Enter the 3D City" button. Desktop controls (in the city):
-WASD to move, Shift to run, mouse for camera (future milestone), E to
-interact, F to sit/stand. Inside the workstation IDE: Ctrl/Cmd+B build,
+WASD to move, Shift to run, mouse-look for the camera (click the
+scene), E to interact (doors, chairs, NPCs — and to enter/exit any
+parked vehicle), F to sit/stand. While driving: W/S accelerate/brake,
+A/D steer. Inside the workstation IDE: Ctrl/Cmd+B build,
 F flash, R run board, Escape exit (see `docs/WORKSTATION_IDE.md`).
 
 ## Setup — Android via Termux (mobile development)

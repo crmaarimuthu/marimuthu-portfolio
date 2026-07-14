@@ -126,6 +126,17 @@ detail. Highlights:
   the same Page Visibility listener that already toggles the R3F
   `frameloop` (`Scene.tsx`), so a backgrounded tab doesn't keep ticking.
 
+## City cost
+
+The open city block (see `docs/CITY_WORLD.md`) adds ~28 building GLB
+instances, 14 trees, 12 parked + up to 4 traffic vehicles, and up to 8
+skinned pedestrian walkers plus 3 idlers. All GLBs are tiny Kenney
+low-poly models (~3.4 MB total, cached by URL via drei) and every
+instance clones a shared cached scene rather than re-downloading. On
+the `LOW` profile `Experience.tsx` renders 4 walkers / 2 traffic cars
+instead of 8/4. Per-frame vehicle/pedestrian transforms live in refs
+(no React re-renders), the same pattern as the player/NPC systems.
+
 ## NPC population cost (Milestone 5)
 
 See `docs/NPC_SYSTEM.md` "Density scaling & update budgets" for full

@@ -11,6 +11,22 @@ The player and every NPC, however, now use **real third-party human
 models** (see "Renderpeople asset attribution" below) — the first
 non-procedural assets in this project.
 
+The city surrounding the office (buildings, trees, all vehicles — see
+`docs/CITY_WORLD.md`) uses **Kenney GLB assets** (see "Kenney asset
+attribution" below). Roads, sidewalks, lane markings, and street lamps
+remain procedural.
+
+## Kenney asset attribution
+
+| Field | Value |
+|---|---|
+| Asset packs | Kenney **Car Kit** (10 vehicles: sedan, sedan-sports, hatchback-sports, suv, taxi, police, van, delivery, truck, race) and **City Kit** (building-type-a…j, tree-large); Kenney **Starter Kit Racing** (vehicle-motorcycle) |
+| Source | Created/distributed by Kenney (www.kenney.nl); GLBs fetched from public GitHub mirrors of the packs (`Arslan12216775/kenney_car-kit`, which bundles the packs' original Kenney `License.txt`, and the official `KenneyNL/Starter-Kit-Racing` repo) |
+| Licence | Car Kit / City Kit: **CC0** (Creative Commons Zero — "You can use this content for personal, educational, and commercial purposes"); Starter Kit Racing: **MIT**. Attribution not required for CC0 but given anyway: assets by **Kenney (www.kenney.nl)**. |
+| Cost | Free — nothing purchased. |
+| Files | `public/models/vehicles/*.glb` + both LICENSE files; `public/models/city/*.glb` + LICENSE file (~3.4 MB total) |
+| Modification | None to the GLB contents; each model is scale-normalised at load time (`VehicleModel.tsx` / `CityEnvironment.tsx`) to match world-space dimensions. |
+
 ## Renderpeople asset attribution
 
 | Field | Value |
