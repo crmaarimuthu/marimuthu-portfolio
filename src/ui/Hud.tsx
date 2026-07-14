@@ -5,6 +5,7 @@ import type { InputManager } from "@/engine/input/InputManager";
 import type { DeviceClass } from "@/state/useAppStore";
 import { useOfficeStore } from "@/state/useOfficeStore";
 import { useNpcStore } from "@/state/useNpcStore";
+import { useVehicleStore } from "@/state/useVehicleStore";
 import { VirtualJoystick } from "./VirtualJoystick";
 import { TouchLookArea } from "./TouchLookArea";
 
@@ -39,6 +40,8 @@ export function Hud({
   // same rationale as workstation mode. See docs/DIALOGUE_SYSTEM.md
   // "Mobile dialogue".
   const dialogueActive = useNpcStore((s) => s.dialogue !== null);
+  const driving = useVehicleStore((s) => s.drivingVehicleId !== null);
+  const nearbyVehicleLabel = useVehicleStore((s) => s.nearbyVehicleLabel);
 
   if (workstationActive || dialogueActive) return null;
 
@@ -63,13 +66,24 @@ export function Hud({
             lineHeight: 1.6,
           }}
         >
-          <div>WASD move &middot; Shift run &middot; Space jump &middot; E interact &middot; F sit/stand</div>
+          {driving ? (
+            <div>W/S accelerate &amp; brake &middot; A/D steer &middot; E exit vehicle</div>
+          ) : (
+            <>
+              <div>WASD move &middot; Shift run &middot; Space jump &middot; E interact &middot; F sit/stand</div>
+              <div>Walk up to a parked car or bike and press E to drive it</div>
+            </>
+          )}
           <div>Click the scene, then move the mouse to look around (360&deg;) &middot; Esc releases the cursor</div>
         </div>
       )}
 
-      {!isTouchDevice && interactionPrompt && (
+      {!isTouchDevice && driving && <div style={desktopPromptStyle}>E &mdash; Exit Vehicle</div>}
+      {!isTouchDevice && !driving && interactionPrompt && (
         <div style={desktopPromptStyle}>E &mdash; {interactionPrompt.label}</div>
+      )}
+      {!isTouchDevice && !driving && !interactionPrompt && nearbyVehicleLabel && (
+        <div style={desktopPromptStyle}>E &mdash; {nearbyVehicleLabel}</div>
       )}
       {!isTouchDevice && seated && (
         <div style={{ ...desktopPromptStyle, bottom: 84 }}>F &mdash; Stand</div>
@@ -108,19 +122,33 @@ export function Hud({
           }}
         >
           <div style={{ display: "flex", gap: 12 }}>
-            <button
-              onPointerDown={() => inputManager.setMobileRunning(true)}
-              onPointerUp={() => inputManager.setMobileRunning(false)}
-              style={buttonStyle}
-            >
-              Run
-            </button>
-            <button onPointerDown={() => inputManager.triggerJump()} style={buttonStyle}>
-              Jump
-            </button>
-            {interactionPrompt && (
+            {!driving && (
+              <>
+                <button
+                  onPointerDown={() => inputManager.setMobileRunning(true)}
+                  onPointerUp={() => inputManager.setMobileRunning(false)}
+                  style={buttonStyle}
+                >
+                  Run
+                </button>
+                <button onPointerDown={() => inputManager.triggerJump()} style={buttonStyle}>
+                  Jump
+                </button>
+              </>
+            )}
+            {driving && (
+              <button onPointerDown={() => inputManager.triggerInteract()} style={contextButtonStyle}>
+                EXIT
+              </button>
+            )}
+            {!driving && interactionPrompt && (
               <button onPointerDown={() => inputManager.triggerInteract()} style={contextButtonStyle}>
                 {INTENT_MOBILE_LABEL[interactionPrompt.intent] ?? "USE"}
+              </button>
+            )}
+            {!driving && !interactionPrompt && nearbyVehicleLabel && (
+              <button onPointerDown={() => inputManager.triggerInteract()} style={contextButtonStyle}>
+                DRIVE
               </button>
             )}
           </div>

@@ -26,7 +26,9 @@ src/
     office/            Office world — Milestone 3 (see docs/OFFICE_WORLD.md)
       rooms/ props/    Room-specific assembly / reusable furniture & door props
       npc/             NPC 3D rendering + population ticking — Milestone 5
-    city/ home/ traffic/ environment/   (future milestones)
+    city/              Open city block: layout data, environment renderer,
+                        traffic, pedestrians, path loops (see docs/CITY_WORLD.md)
+    home/ environment/  (future milestones)
   player/
     PlayerCapsule, PlayerConfig, playerMovement, animationState,
     CameraController, InteractionController
@@ -35,7 +37,8 @@ src/
                         assignment, meetings — Milestone 5 (see docs/NPC_SYSTEM.md)
     teams/             Team model + validation — Milestone 5 (see docs/TEAM_SYSTEM.md)
     player/            Avatar integration layer (future — not yet implemented)
-  vehicles/            (future milestones)
+  vehicles/            Drivable vehicles: arcade physics, catalogue/config,
+                        GLB instancing, enter/drive/exit runtime (see docs/CITY_WORLD.md)
   dialogue/            Structured offline dialogue system — Milestone 5 (see docs/DIALOGUE_SYSTEM.md)
   portfolio/           Typed content schema + validation (portfolioTypes.ts, portfolioContent.ts)
                        — data layer only, see docs/PORTFOLIO_CONTENT.md; in-world display panels remain future (Milestone 6)

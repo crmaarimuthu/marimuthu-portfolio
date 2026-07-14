@@ -69,6 +69,11 @@ finger dragging to look (right) work simultaneously.
   `InteractionController` currently considers nearest/valid — it is
   hidden, not just disabled, when nothing is in range (see
   docs/INTERACTION_SYSTEM.md).
+- A **DRIVE** context button appears (same slot) when the nearest
+  enterable vehicle is in range (`useVehicleStore.nearbyVehicleId`);
+  while driving, Run/Jump are replaced by a single **EXIT** button and
+  the joystick becomes throttle/steer (up = accelerate, down =
+  brake/reverse, left/right = steer) — see docs/CITY_WORLD.md.
 - A separate **STAND** button appears above the run/context pair only
   while the player is seated (`chair.playerState === "SEATED"`),
   positioned to avoid overlapping either the joystick or the

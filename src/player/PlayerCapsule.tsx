@@ -24,12 +24,18 @@ export function PlayerCapsule({
   collisionWalls = [],
   onTransformChange,
   onAnimationStateChange,
+  consumeTeleport,
 }: {
   getInputState: () => InputState;
   getCameraYaw?: () => number;
   collisionWalls?: CollisionWall[];
   onTransformChange?: (t: PlayerTransform) => void;
   onAnimationStateChange?: (s: PlayerAnimationState) => void;
+  /**
+   * Polled once per frame; a non-null result repositions the player
+   * instantly (used when stepping out of a vehicle — see CityVehicles).
+   */
+  consumeTeleport?: () => PlayerTransform | null;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const transformRef = useRef<PlayerTransform>({ x: 0, z: 0, heading: 0 });
@@ -58,6 +64,13 @@ export function PlayerCapsule({
   }, [pendingTransition]);
 
   useFrame((_, dt) => {
+    const teleport = consumeTeleport?.();
+    if (teleport) {
+      transformRef.current = { ...teleport };
+      jumpHeightRef.current = 0;
+      jumpVelocityRef.current = 0;
+    }
+
     if (locomotionState === "NORMAL" && dialogueActive) {
       // Dialogue (Milestone 5) suspends movement even while standing
       // (not seated) — input is not consumed, and since the animation
