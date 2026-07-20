@@ -4,10 +4,13 @@ _Last synced: 2026-07-21, from repo state at commit `4f28622` (branch `main`, cl
 
 ## Quality gate (per README, as of last recorded run)
 
-- `npm run lint` — passing
-- `npm run typecheck` — passing
+- `npm run lint` — passing (as of last recorded run; NOT re-verified after the
+  2026-07-21 landing-page cinematic UI pass — see CHANGELOG — because this
+  machine currently has no Node.js/npm installed. Run the full gate before
+  trusting it.)
+- `npm run typecheck` — same caveat as above
 - `npm run test` — 249/249 tests passing (33 suites) *as of Milestone 5* — vehicle/city code has tests too (`vehiclePhysics.test.ts`, `cityLayout.test.ts`, `pathLoop.test.ts`) so actual current count is higher; re-run `npm run test` for the live number rather than trusting this file.
-- `npm run build` — passing (static export of `/`)
+- `npm run build` — passing (static export of `/`) as of last recorded run; same not-re-verified caveat.
 
 Re-verify all four before trusting this section for anything load-bearing (e.g. before a deploy) — this is a memory snapshot, not a live CI status.
 
