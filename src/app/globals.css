@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,13 +14,10 @@
 
 html {
   height: 100%;
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+  /* Smooth scrolling is driven by Lenis (src/ui/portfolio/useLenis.ts) on
+     the 2D landing page; native smooth-scroll stays off so the two never
+     fight each other. Lenis itself no-ops under prefers-reduced-motion. */
+  scroll-behavior: auto;
 }
 
 ::selection {

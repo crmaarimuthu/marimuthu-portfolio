@@ -19,8 +19,9 @@ This file is a lookup table — find your module, jump straight to the doc + sou
 | Dialogue engine + content | `src/dialogue/`, `src/content/dialogue/*.json` | `docs/DIALOGUE_SYSTEM.md` |
 | Embedded firmware simulation (build/flash/board/GPIO/runtime) | `src/simulations/embedded/` | `docs/EMBEDDED_SIMULATION.md`, `docs/VIRTUAL_BOARD.md` |
 | Embedded IDE overlay UI | `src/ui/workstation/` | `docs/WORKSTATION_IDE.md` |
-| Portfolio content data layer (typed skills/projects/experience) | `src/portfolio/`, `src/content/portfolio/` | `docs/PORTFOLIO_CONTENT.md` |
-| 2D portfolio landing page | `src/ui/portfolio/PortfolioPage.tsx` | `docs/PORTFOLIO_CONTENT.md` |
+| Portfolio content data layer (typed skills/projects/experience, 8 categories) | `src/portfolio/`, `src/content/portfolio/` | `docs/PORTFOLIO_CONTENT.md` |
+| 2D portfolio landing page (Lenis scroll, Framer Motion reveals, GSAP/ScrollTrigger stats+timeline) | `src/ui/portfolio/PortfolioPage.tsx`, `src/ui/portfolio/useLenis.ts` | `docs/PORTFOLIO_CONTENT.md` |
+| Hero R3F scene (PCB/chips/CAN packets/oscilloscope/bloom) — client-only-mounted behind a capability check, SVG fallback otherwise | `src/ui/portfolio/hero3d/` | `docs/PORTFOLIO_CONTENT.md` |
 | HUD / loading screen / dialogue overlay | `src/ui/` | — |
 | State (Zustand) | `src/state/` | see below |
 | Engine choice rationale | — | `docs/ADR_001_3D_ENGINE_SELECTION.md` |
@@ -44,6 +45,15 @@ state (rare, shared).
   `ssr:false`) — WebGL cannot run server-side.
 - `Scene.tsx` runs `detectCapability()` once; falls back to
   `PortfolioFallback` if WebGL2 unsupported.
+- `/` (landing page) is server-rendered/statically generated, unlike `/city`
+  — so its hero can't use the Scene.tsx "lazy useState initializer" trick
+  (that only works because Scene.tsx is never SSR'd). Instead `Hero3D` in
+  `PortfolioPage.tsx` renders the static SVG circuit on both the server AND
+  the first client render (hydration-safe), then swaps to the
+  `next/dynamic(ssr:false)`-loaded `hero3d/HeroCanvas` in a post-mount effect
+  once `detectCapability()` confirms WebGL2 + no reduced-motion. The
+  `hero3d/` chunk (three.js + postprocessing, ~800KB+ raw) is confirmed via
+  the built HTML to be excluded from `/`'s initial script list.
 - Quality profile (LOW/MEDIUM/HIGH/ULTRA) auto-selected from device
   heuristics, overridable + persisted to `localStorage`.
 - No physics engine (Rapier evaluated in ADR_001, not adopted) — collision is

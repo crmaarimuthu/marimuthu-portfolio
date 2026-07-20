@@ -15,7 +15,11 @@ export type PortfolioCategory =
   | "embedded"
   | "communication"
   | "energy-systems"
-  | "linux-tooling";
+  | "programming"
+  | "tools"
+  | "linux-tooling"
+  | "cloud"
+  | "scada";
 
 export interface TechStackItem {
   id: string;
@@ -31,7 +35,20 @@ export interface SkillEntry {
   description: string;
 }
 
-export type ProjectStatus = "TODO_USER_INPUT" | "completed" | "in-progress" | "archived";
+/**
+ * "details-pending" marks a project whose *title* is real (the user
+ * confirmed this is a genuine project area) but whose summary/
+ * responsibilities/outcome are still `TODO_USER_INPUT` — distinct from
+ * the legacy "TODO_USER_INPUT" status (title itself still a placeholder)
+ * so the UI can render an honest "write-up pending" state instead of
+ * hiding the card or leaking the literal placeholder string.
+ */
+export type ProjectStatus =
+  | "TODO_USER_INPUT"
+  | "details-pending"
+  | "completed"
+  | "in-progress"
+  | "archived";
 
 export interface ProjectEntry {
   id: string;
@@ -42,6 +59,11 @@ export interface ProjectEntry {
   technologies: string[];
   outcome: string;
   status: ProjectStatus;
+  /** Optional external links — only rendered when present, never fabricated. */
+  githubUrl?: string;
+  liveUrl?: string;
+  architectureUrl?: string;
+  docsUrl?: string;
 }
 
 export interface ExperienceEntry {

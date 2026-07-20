@@ -1,18 +1,26 @@
 # Status
 
-_Last synced: 2026-07-21, from repo state at commit `4f28622` (branch `main`, clean working tree)._
+_Last synced: 2026-07-21 (later session), from repo state at commit `4f28622` (branch `main`) + uncommitted working tree changes described below._
 
-## Quality gate (per README, as of last recorded run)
+## Quality gate
 
-- `npm run lint` — passing (as of last recorded run; NOT re-verified after the
-  2026-07-21 landing-page cinematic UI pass — see CHANGELOG — because this
-  machine currently has no Node.js/npm installed. Run the full gate before
-  trusting it.)
-- `npm run typecheck` — same caveat as above
-- `npm run test` — 249/249 tests passing (33 suites) *as of Milestone 5* — vehicle/city code has tests too (`vehiclePhysics.test.ts`, `cityLayout.test.ts`, `pathLoop.test.ts`) so actual current count is higher; re-run `npm run test` for the live number rather than trusting this file.
-- `npm run build` — passing (static export of `/`) as of last recorded run; same not-re-verified caveat.
+- `npm run lint` — **passing** (verified 2026-07-21, after installing Node.js
+  v24.18.0/npm 11.16.0 via winget on this machine — it had none before).
+- `npm run typecheck` — **passing**, same run.
+- `npm run test` — **288/288 tests passing (38 suites)**, same run.
+- `npm run build` (`next build`, Turbopack) — **passing**, both `/` and
+  `/city` statically generated. Confirmed via the built HTML that the
+  three.js/postprocessing chunk used by the new hero 3D scene is excluded
+  from `/`'s initial script list (only loads once `Hero3D` actually mounts
+  the canvas).
+- **Not verified**: no real browser/Lighthouse run was possible in this
+  environment (no headless Chrome / dev server check). The hero 3D scene,
+  animations, and all new interactions are unverified visually — run
+  `npm run dev` and eyeball it, and run Lighthouse before trusting the
+  "95+" performance target from the original brief.
 
-Re-verify all four before trusting this section for anything load-bearing (e.g. before a deploy) — this is a memory snapshot, not a live CI status.
+This section now reflects a real run, not a stale snapshot — but re-run
+before trusting it for a deploy, per usual.
 
 ## Milestone status
 
@@ -20,8 +28,12 @@ DONE: 1, 3, 4, 5, plus vehicles/city-block (M9 scope) and portfolio content data
 NOT STARTED: 2 (avatar/GLB), 6 (in-world content display), 7 (map/city-zone streaming), 8 (home/day-night), 10 (production hardening).
 Full breakdown: [FEATURES.md](FEATURES.md).
 
-## Recent activity (from git log)
+## Recent activity (from git log + uncommitted work)
 
+- (uncommitted) AAA cinematic 3D upgrade of `/`: real user identity/specialization
+  content, Tailwind v4 + Framer Motion + GSAP/ScrollTrigger + Lenis + R3F
+  hero scene with bloom, 8-category hex skill grid, GTA-style mission
+  loading screen. See CHANGELOG for full detail.
 - `updated 3d city` — city world / vehicle work
 - `updated portfolio`
 - Typed portfolio content data layer added (M6 prep)

@@ -31,10 +31,13 @@ Full detail: [`../docs/ROADMAP.md`](../docs/ROADMAP.md) (milestone plan, status 
   layer, full skinned clips, camera orbit/collision improvements. (The
   animation *state machine* itself was extended ahead of schedule for
   sit/stand — see `docs/ANIMATION_SYSTEM.md`.)
-- **M6 — Portfolio content display**: in-world display surface for
-  self-intro/skills/projects/EMS-BMS presentation. Data layer exists;
-  most project/experience content is still `TODO_USER_INPUT` (see
-  [TODO.md](TODO.md)).
+- **M6 — Portfolio content display**: in-world (3D) display surface still
+  not started. The *2D* landing page display surface progressed
+  significantly (2026-07-21): real identity/specialization content, 8
+  real project titles (BMS/EMS/BESS/SCADA Platform/CAN Analyzer/Modbus
+  Gateway/Embedded Linux Gateway/Industrial IoT Gateway) now render, but
+  their summaries/technologies/outcomes are still `TODO_USER_INPUT` (see
+  [TODO.md](TODO.md)). `experience.ts` is still fully placeholder.
 - **M7 — India map & city zone**: cinematic map, location transition, city
   zone streaming.
 - **M8 — Home & day/night**: home, sleep flow, world clock tied to NPC

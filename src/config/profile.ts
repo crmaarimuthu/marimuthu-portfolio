@@ -16,8 +16,8 @@ export interface ProfileConfig {
 }
 
 export const profileConfig: ProfileConfig = {
-  name: "Marimuthu Rajagopal",
-  professionalTitle: "Embedded Systems Engineer",
+  name: "C.R. Maari (Marimuthu)",
+  professionalTitle: "Senior Embedded Firmware Engineer",
   country: "India",
   state: "Tamil Nadu",
   city: "Coimbatore",
